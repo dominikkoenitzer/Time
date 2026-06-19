@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Package manager is **bun** (bun.lock). No test suite exists.
 
 ```bash
-bun run dev        # dev server at http://localhost:3000 (Turbopack)
+bun run dev        # dev server at http://localhost:1000 (Turbopack)
 bun run build      # production build
 bun run typecheck  # tsc --noEmit
 bun run lint       # eslint
