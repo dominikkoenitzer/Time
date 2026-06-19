@@ -120,7 +120,7 @@ const stationSub: React.CSSProperties = {
 const headline: React.CSSProperties = {
   fontWeight: 500,
   letterSpacing: "-0.025em",
-  fontSize: "clamp(40px, 6.4vw, 92px)",
+  fontSize: "clamp(30px, 6.4vw, 92px)",
   lineHeight: 1.02,
 }
 const railLabel: React.CSSProperties = {
@@ -496,7 +496,7 @@ export function KineticClock() {
       {/* Force this immersive route fully dark regardless of the site's theme:
           overrides next-themes' light color-scheme and the white body bg. In the
           SSR HTML, so it applies at first paint — no white scrollbar/flash. */}
-      <style>{`html,body{background:#08080a!important}html{color-scheme:dark!important}`}</style>
+      <style>{`html,body{background:#08080a!important;overflow-x:hidden}html{color-scheme:dark!important}@media(max-width:640px){.kc-rail{display:none!important}}`}</style>
       <canvas
         ref={canvasRef}
         aria-hidden
@@ -557,7 +557,7 @@ export function KineticClock() {
               fontWeight: 500,
               letterSpacing: "-0.05em",
               lineHeight: 0.8,
-              fontSize: "clamp(96px, 17vw, 280px)",
+              fontSize: "clamp(44px, 17vw, 280px)",
               textShadow: "0 4px 60px rgba(0,0,0,0.5)",
             }}
           >
@@ -600,6 +600,7 @@ export function KineticClock() {
         {/* station rail */}
         <div
           ref={railRef}
+          className="kc-rail"
           style={{
             position: "absolute",
             right: 34,
@@ -629,7 +630,7 @@ export function KineticClock() {
           <div style={stationLabel}>01 — The second</div>
           <div
             className="tabular-nums"
-            style={{ fontWeight: 500, letterSpacing: "-0.03em", fontSize: "clamp(48px, 8vw, 116px)", lineHeight: 0.92 }}
+            style={{ fontWeight: 500, letterSpacing: "-0.03em", fontSize: "clamp(26px, 8vw, 116px)", lineHeight: 0.92 }}
           >
             9,192,631,770
           </div>
@@ -676,7 +677,7 @@ export function KineticClock() {
               fontFamily: mono,
               fontWeight: 500,
               letterSpacing: "-0.02em",
-              fontSize: "clamp(44px, 7vw, 104px)",
+              fontSize: "clamp(24px, 7vw, 104px)",
               lineHeight: 0.95,
             }}
           >
