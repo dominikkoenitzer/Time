@@ -627,7 +627,7 @@ export function KineticClock() {
 
         {/* 01 — The second */}
         <div ref={s1Ref} style={station}>
-          <div style={stationLabel}>01 — The second</div>
+          <div style={stationLabel}>The second</div>
           <div
             className="tabular-nums"
             style={{ fontWeight: 500, letterSpacing: "-0.03em", fontSize: "clamp(26px, 8vw, 116px)", lineHeight: 0.92 }}
@@ -642,7 +642,7 @@ export function KineticClock() {
 
         {/* 02 — Today */}
         <div ref={s2Ref} style={station}>
-          <div style={stationLabel}>02 — Today</div>
+          <div style={stationLabel}>Today</div>
           <div style={{ ...headline, maxWidth: "13ch" }}>
             Today is <span className="tabular-nums" ref={todayPctRef}>0.0</span>% spent.
           </div>
@@ -654,7 +654,7 @@ export function KineticClock() {
 
         {/* 03 — This year */}
         <div ref={s3Ref} style={station}>
-          <div style={stationLabel}>03 — This year</div>
+          <div style={stationLabel}>This year</div>
           <div style={{ ...headline, maxWidth: "13ch" }}>
             <span ref={yearRef}>2026</span> is{" "}
             <span className="tabular-nums" ref={yearPctRef}>0.00</span>% gone.
@@ -669,7 +669,7 @@ export function KineticClock() {
 
         {/* 04 — The epoch */}
         <div ref={s4Ref} style={station}>
-          <div style={stationLabel}>04 — The epoch</div>
+          <div style={stationLabel}>The epoch</div>
           <div
             className="tabular-nums"
             ref={unixRef}
@@ -691,7 +691,7 @@ export function KineticClock() {
 
         {/* 05 — Right now */}
         <div ref={s5Ref} style={station}>
-          <div style={stationLabel}>05 — Right now</div>
+          <div style={stationLabel}>Right now</div>
           <div style={{ ...headline, maxWidth: "14ch" }}>
             You&apos;ve been here{" "}
             <span className="tabular-nums" ref={onpageRef}>0 seconds</span>.
