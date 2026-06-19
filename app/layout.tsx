@@ -1,9 +1,12 @@
 import type { Metadata, Viewport } from "next"
-import { Geist_Mono, Figtree } from "next/font/google"
+import {
+  Geist_Mono,
+  Figtree,
+  Space_Grotesk,
+  JetBrains_Mono,
+} from "next/font/google"
 
 import "./globals.css"
-import { SiteFooter } from "@/components/site-footer"
-import { SiteHeader } from "@/components/site-header"
 import { ThemeProvider } from "@/components/theme-provider"
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site"
 import { cn } from "@/lib/utils"
@@ -13,6 +16,19 @@ const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" })
 const fontMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
+})
+
+// Display + mono pairing for the kinetic home experience.
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-display",
+})
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-kinetic-mono",
 })
 
 export const metadata: Metadata = {
@@ -50,16 +66,17 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn("antialiased", fontMono.variable, "font-sans", figtree.variable)}
+      className={cn(
+        "antialiased",
+        "font-sans",
+        figtree.variable,
+        fontMono.variable,
+        spaceGrotesk.variable,
+        jetbrainsMono.variable
+      )}
     >
       <body>
-        <ThemeProvider>
-          <div className="flex min-h-svh flex-col">
-            <SiteHeader />
-            <main className="flex-1">{children}</main>
-            <SiteFooter />
-          </div>
-        </ThemeProvider>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   )
