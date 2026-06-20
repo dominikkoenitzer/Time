@@ -21,7 +21,7 @@ Time shows the precise, server-corrected current time — synchronized the same 
 - **World clock comparison** and a curated grid of featured cities.
 - **Favorites and recently viewed** zones, persisted locally in your browser.
 - **12/24-hour, light/dark, and a fullscreen clock**, all keyboard-driven.
-- **No external time APIs and no timezone data files** — all timezone math is done client-side with the built-in `Intl` APIs. The server's only job is returning its own time for the sync check.
+- **No external time APIs and no timezone data files** — all timezone math is done client-side with the built-in `Intl` APIs. The server's only job is the `/api/time` endpoint, which returns NTP-disciplined true UTC for the sync check.
 
 ## Keyboard shortcuts
 
@@ -75,16 +75,18 @@ The site needs no environment variables to run. One optional variable is support
 | Path                  | What lives there                                                        |
 | --------------------- | ----------------------------------------------------------------------- |
 | `app/`                | App Router routes, layout, metadata, sitemap, robots, OG image          |
-| `app/api/time/`       | The one server endpoint — returns `Date.now()` for the sync check       |
+| `app/api/time/`       | The one server endpoint — returns NTP-disciplined true UTC for the sync check |
 | `app/[...zone]/`      | Catch-all that resolves IANA paths and bare city names to a clock       |
 | `components/`         | UI — clock, timezone search, world clocks, header/footer                |
 | `hooks/`              | Live-time ticking and 12/24-hour preference                             |
-| `lib/`                | Timezone math (`time.ts`), clock sync (`clock-sync.ts`), local stores, site config |
+| `lib/`                | Timezone math (`time.ts`), client clock sync (`clock-sync.ts`), server NTP discipline (`server-time.ts`), local stores, site config |
 | `public/`             | Static assets                                                           |
 
 ## How synchronization works
 
-`lib/clock-sync.ts` samples `app/api/time/route.ts` several times. It keeps the sample with the lowest round-trip time, compensates the server timestamp for half that round trip, and treats RTT/2 of the best sample as the accuracy bound. The resulting offset corrects every clock on the site. Watchdogs re-measure when the wall-vs-monotonic baseline jumps (a manual clock change or sleep/wake) or when the tab becomes visible again after the result goes stale.
+Two layers keep the time honest. On the server, `lib/server-time.ts` disciplines the `/api/time` endpoint against public NTP servers (Cloudflare, Google, `pool.ntp.org`) over UDP — with an HTTP fallback — so the endpoint returns true UTC even if the host's own clock has drifted.
+
+On the client, `lib/clock-sync.ts` samples that endpoint several times. It keeps the sample with the lowest round-trip time, compensates the server timestamp for half that round trip, and treats RTT/2 of the best sample as the accuracy bound. The resulting offset corrects every clock on the site. Watchdogs re-measure when the wall-vs-monotonic baseline jumps (a manual clock change or sleep/wake) or when the tab becomes visible again after the result goes stale.
 
 ## Contributing
 
