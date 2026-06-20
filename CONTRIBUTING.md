@@ -35,7 +35,7 @@ Formatting is enforced by Prettier (no semicolons, double quotes, 2-space indent
 - **Tailwind v4 with CSS-based config.** There is no `tailwind.config.*`; design tokens live in `app/globals.css` under `@theme inline`, declared in both `:root` and `.dark`.
 - **Icons** render as `<HugeiconsIcon icon={SomeIcon} />`, imported from `@hugeicons/core-free-icons`. Confirm an icon name exists in that package before using it.
 - **Timezone math is client-side `Intl`.** There are no external time APIs and no timezone data files; the server only returns its own time for the sync check. Keep it that way.
-- **Sync-status wording.** `components/sync-status.tsx` mirrors time.is phrasing (_"Your clock is 0.4 seconds behind."_, _"Accuracy of synchronization was ±0.023 seconds."_). Preserve that style.
+- **Sync-status wording.** `components/sync-status.tsx` states the synchronization result and its precision (_"Accuracy of synchronization was ±0.023 seconds."_). It presents the accuracy of the **displayed time**, not a judgment of the visitor's own device clock — keep that framing.
 
 ## Commits and pull requests
 

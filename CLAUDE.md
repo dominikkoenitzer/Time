@@ -25,7 +25,7 @@ Add shadcn/ui components with `npx shadcn@latest add <component>` (style: radix-
 
 ## What this site is
 
-A time.is-style site ("Time"). The unique selling point is the **clock accuracy check**: the site measures the visitor's device clock against the server and states the result in time.is wording — "Your clock is 0.4 seconds behind." / "Accuracy of synchronization was ±0.023 seconds." Keep that wording style when touching `components/sync-status.tsx`.
+A clean "exact time" site ("Time"). The unique selling point is **server-synchronized accuracy**: the site measures the visitor's offset to the server (NTP-style), corrects the displayed time, and states the precision — "Accuracy of synchronization was ±0.023 seconds." It does **not** position itself as auditing the visitor's own device clock; keep that framing (synchronization + precision of the shown time, not "your clock is wrong") when touching `components/sync-status.tsx`.
 
 ## Architecture
 

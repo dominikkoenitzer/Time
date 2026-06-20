@@ -35,7 +35,10 @@ export default function AboutPage() {
             </Link>
             .
           </li>
-          <li>Check how accurate your device clock is.</li>
+          <li>
+            See how accurate the displayed time is — every reading states its
+            own margin of error.
+          </li>
           <li>
             Compare time across locations: world clocks for your favorite cities
             and an hour-by-hour strip for planning calls.

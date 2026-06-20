@@ -26,12 +26,12 @@ export default function PrivacyPage() {
         </p>
       </PageSection>
 
-      <PageSection heading="The clock accuracy check">
+      <PageSection heading="Time synchronization">
         <p>
-          To measure your clock&apos;s accuracy, your browser requests the
-          current time from our server a few times when a page loads. These
-          requests carry no personal information — only timestamps travel in
-          either direction, and nothing about the measurement is stored.
+          To synchronize the displayed time, your browser requests the current
+          time from our server a few times when a page loads. These requests
+          carry no personal information — only timestamps travel in either
+          direction, and nothing about the measurement is stored.
         </p>
       </PageSection>
 
