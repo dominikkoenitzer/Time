@@ -12,8 +12,7 @@ export default function NotFound() {
         We couldn&apos;t find that place
       </h1>
       <p className="max-w-sm text-sm text-muted-foreground">
-        Try searching for a city in the header, or head back to your local
-        time.
+        Try searching for a city in the header, or head back to your local time.
       </p>
       <Button asChild className="mt-2">
         <Link href="/">Back to local time</Link>
