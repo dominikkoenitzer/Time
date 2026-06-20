@@ -20,9 +20,9 @@ export default function PrivacyPage() {
 
       <PageSection heading="What stays on your device">
         <p>
-          Your 12/24-hour format choice and your light/dark theme preference are
-          stored in your browser&apos;s local storage. They never leave your
-          device, and clearing your browser data removes them.
+          Your light/dark theme preference is stored in your browser&apos;s
+          local storage. It never leaves your device, and clearing your browser
+          data removes it.
         </p>
       </PageSection>
 

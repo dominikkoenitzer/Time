@@ -55,45 +55,10 @@ const faqs = [
     ),
   },
   {
-    question: "Which cities and time zones are supported?",
-    answer: (
-      <p>
-        All of them — every zone in the IANA time zone database. Press{" "}
-        <kbd>/</kbd> and search for any city, or go there directly with an
-        address like{" "}
-        <Link
-          href="/europe/zurich"
-          className="text-foreground underline underline-offset-4"
-        >
-          /europe/zurich
-        </Link>{" "}
-        or simply{" "}
-        <Link
-          href="/tokyo"
-          className="text-foreground underline underline-offset-4"
-        >
-          /tokyo
-        </Link>
-        .
-      </p>
-    ),
-  },
-  {
-    question: "Can I use the 12-hour format?",
-    answer: (
-      <p>
-        Yes — use the 24H/12H button in the header. The preference is saved on
-        your device and applies everywhere: the main clock, the world clocks,
-        and search results.
-      </p>
-    ),
-  },
-  {
     question: "Are there keyboard shortcuts?",
     answer: (
       <p>
-        <kbd>/</kbd> focuses the search, <kbd>F</kbd> toggles the fullscreen
-        clock, and <kbd>D</kbd> switches between light and dark mode.
+        <kbd>D</kbd> switches between light and dark mode.
       </p>
     ),
   },
