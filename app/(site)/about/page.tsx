@@ -36,10 +36,6 @@ export default function AboutPage() {
             .
           </li>
           <li>
-            See how accurate the displayed time is — every reading states its
-            own margin of error.
-          </li>
-          <li>
             Compare time across locations: world clocks for your favorite cities
             and an hour-by-hour strip for planning calls.
           </li>
@@ -58,9 +54,9 @@ export default function AboutPage() {
             the displayed time is adjusted by the best measurement.
           </li>
           <li>
-            The margin of error is measured, not promised. Every check states
-            its own accuracy, which depends on your connection; on a good one it
-            is typically a few hundredths of a second.
+            The correction is measured, not guessed. How precisely the time can
+            be pinned depends on your connection; on a good one the displayed
+            time is accurate to within a few hundredths of a second.
           </li>
           <li>
             The display updates at the beginning of every second. Many web
