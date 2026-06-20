@@ -1,0 +1,67 @@
+name: Bug report
+description: Report something that is broken or behaving incorrectly.
+title: "bug: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for the report. Please fill in the details below so the issue can be reproduced.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug, and what you expected instead.
+      placeholder: When I open /europe/zurich, the clock shows…
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: How can this be reproduced reliably?
+      placeholder: |
+        1. Go to '...'
+        2. Click '...'
+        3. See the wrong value
+    validations:
+      required: true
+
+  - type: input
+    id: url
+    attributes:
+      label: Page or timezone
+      description: The URL or timezone where it happens, if relevant.
+      placeholder: https://time.punds.ch/tokyo
+    validations:
+      required: false
+
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      options:
+        - Chrome
+        - Firefox
+        - Safari
+        - Edge
+        - Other (note it below)
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: Windows 11, macOS 15, iOS 18, Android 15…
+    validations:
+      required: false
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshots or console output
+      description: Anything else that helps — screenshots, console errors, etc.
+    validations:
+      required: false
