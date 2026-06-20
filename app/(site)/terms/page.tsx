@@ -20,9 +20,9 @@ export default function TermsPage() {
       <PageSection heading="The service">
         <p>
           Time displays the current time for your device and for time zones
-          around the world, and estimates how far your device clock deviates
-          from our server clock. The service is provided free of charge, as is,
-          and may change or be discontinued at any time.
+          around the world, synchronized with our server clock. The service is
+          provided free of charge, as is, and may change or be discontinued at
+          any time.
         </p>
       </PageSection>
 

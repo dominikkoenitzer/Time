@@ -1,8 +1,8 @@
 # Time
 
-**The exact time, anywhere — and a check of how accurate _your_ clock really is.**
+**The exact time, anywhere — synchronized with the server and accurate to within hundredths of a second.**
 
-A [time.is](https://time.is)-style site. It shows the precise, server-corrected current time, tells you in plain words how far your device clock has drifted (_"Your clock is 0.4 seconds behind."_), and lets you read the time in any city in the world.
+Time shows the precise, server-corrected current time — synchronized the same way NTP works, so it stays right even when the device you're viewing it on is set wrong — and lets you read the current time in any city in the world.
 
 [![CI](https://github.com/dominikkoenitzer/Time/actions/workflows/ci.yml/badge.svg)](https://github.com/dominikkoenitzer/Time/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=nextdotjs)
@@ -15,8 +15,8 @@ A [time.is](https://time.is)-style site. It shows the precise, server-corrected 
 
 ## Features
 
-- **Clock accuracy check (the point of the site).** An NTP-style measurement samples the server several times, keeps the lowest round-trip sample, and reports your device clock's offset and the accuracy of the result — _"Accuracy of synchronization was ±0.023 seconds."_
-- **Server-corrected time everywhere.** Every clock on the site is drawn from the measured offset, not your device clock, so the displayed time stays correct even if your machine's clock is wrong.
+- **Synchronized, accurate time (the point of the site).** An NTP-style measurement samples the server several times, keeps the lowest round-trip sample, corrects the displayed time, and states its precision — _"Accuracy of synchronization was ±0.023 seconds."_
+- **Server-corrected time everywhere.** Every clock on the site is drawn from the measured server offset, so the displayed time stays correct even if the device it runs on is set wrong.
 - **Any timezone, clean URLs.** Full IANA paths like `/europe/zurich` or bare city names like `/tokyo` resolve to a live local clock with date, UTC offset and ISO week.
 - **World clock comparison** and a curated grid of featured cities.
 - **Favorites and recently viewed** zones, persisted locally in your browser.
@@ -82,7 +82,7 @@ The site needs no environment variables to run. One optional variable is support
 | `lib/`                | Timezone math (`time.ts`), clock sync (`clock-sync.ts`), local stores, site config |
 | `public/`             | Static assets                                                           |
 
-## How the sync check works
+## How synchronization works
 
 `lib/clock-sync.ts` samples `app/api/time/route.ts` several times. It keeps the sample with the lowest round-trip time, compensates the server timestamp for half that round trip, and treats RTT/2 of the best sample as the stated accuracy. The resulting offset corrects every clock on the site. Watchdogs re-measure when the wall-vs-monotonic baseline jumps (a manual clock change or sleep/wake) or when the tab becomes visible again after the result goes stale.
 
