@@ -39,8 +39,8 @@ export default function TermsPage() {
         <p>
           To the maximum extent permitted by law, the operator of this site is
           not liable for any damages arising from the use of, or inability to
-          use, this website — including decisions made based on the times or
-          accuracy measurements displayed.
+          use, this website — including decisions made based on the times
+          displayed.
         </p>
       </PageSection>
 
