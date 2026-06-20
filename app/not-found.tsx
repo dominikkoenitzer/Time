@@ -9,13 +9,13 @@ export default function NotFound() {
         00:00
       </p>
       <h1 className="text-2xl font-semibold tracking-tight">
-        We couldn&apos;t find that place
+        We couldn&apos;t find that page
       </h1>
       <p className="max-w-sm text-sm text-muted-foreground">
-        Try searching for a city in the header, or head back to your local time.
+        That page doesn&apos;t exist. Head back to the clock.
       </p>
       <Button asChild className="mt-2">
-        <Link href="/">Back to local time</Link>
+        <Link href="/">Back to the clock</Link>
       </Button>
     </div>
   )
