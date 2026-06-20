@@ -1,0 +1,15 @@
+# Normalize line endings deterministically across machines.
+* text=auto eol=lf
+
+# Binary assets — never diffed or line-ending-converted.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+
+# Generated lockfile — collapse in diffs and exclude from language stats.
+bun.lock linguist-generated=true -diff
