@@ -21,6 +21,6 @@ Please include:
 
 ## Scope
 
-This is a static, client-rendered website. It has a single server endpoint (`/api/time`) that returns the server's current time and nothing else; it stores no accounts and no personal data on a server. User preferences (favorites, recently viewed zones, time-format) live only in the visitor's own browser via `localStorage`.
+This is a static, client-rendered website. It has a single server endpoint (`/api/time`) that returns the server's current time and nothing else; it stores no accounts and no personal data on a server. The only saved preference — light or dark theme — lives in the visitor's own browser via `localStorage`.
 
 Reports most relevant to this project include cross-site scripting, content-injection, dependency vulnerabilities, and anything that could mislead a visitor about the displayed time.
