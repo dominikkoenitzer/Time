@@ -21,8 +21,8 @@ export default function TermsPage() {
         <p>
           Time displays the current time for your device and for time zones
           around the world, and estimates how far your device clock deviates
-          from our server clock. The service is provided free of charge, as
-          is, and may change or be discontinued at any time.
+          from our server clock. The service is provided free of charge, as is,
+          and may change or be discontinued at any time.
         </p>
       </PageSection>
 
@@ -38,18 +38,18 @@ export default function TermsPage() {
 
       <PageSection heading="Limitation of liability">
         <p>
-          To the maximum extent permitted by law, the operator of this site
-          is not liable for any damages arising from the use of, or inability
-          to use, this website — including decisions made based on the times
-          or accuracy measurements displayed.
+          To the maximum extent permitted by law, the operator of this site is
+          not liable for any damages arising from the use of, or inability to
+          use, this website — including decisions made based on the times or
+          accuracy measurements displayed.
         </p>
       </PageSection>
 
       <PageSection heading="Changes">
         <p>
-          These terms may be updated from time to time. The date above
-          reflects the latest revision; continued use after a change means
-          you accept the revised terms.
+          These terms may be updated from time to time. The date above reflects
+          the latest revision; continued use after a change means you accept the
+          revised terms.
         </p>
       </PageSection>
     </PageShell>

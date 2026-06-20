@@ -13,16 +13,16 @@ export default function PrivacyPage() {
     <PageShell title="Privacy policy" lead="Last updated June 11, 2026.">
       <PageSection heading="The short version">
         <p>
-          Time has no accounts, sets no tracking cookies, and runs no
-          analytics. We don&apos;t know who you are and don&apos;t want to.
+          Time has no accounts, sets no tracking cookies, and runs no analytics.
+          We don&apos;t know who you are and don&apos;t want to.
         </p>
       </PageSection>
 
       <PageSection heading="What stays on your device">
         <p>
-          Your 12/24-hour format choice and your light/dark theme preference
-          are stored in your browser&apos;s local storage. They never leave
-          your device, and clearing your browser data removes them.
+          Your 12/24-hour format choice and your light/dark theme preference are
+          stored in your browser&apos;s local storage. They never leave your
+          device, and clearing your browser data removes them.
         </p>
       </PageSection>
 
@@ -38,9 +38,9 @@ export default function PrivacyPage() {
       <PageSection heading="Server logs">
         <p>
           Like virtually every website, our hosting infrastructure may keep
-          short-lived technical logs (such as IP addresses and requested
-          pages) for security and reliability. These are not used to identify
-          or profile visitors.
+          short-lived technical logs (such as IP addresses and requested pages)
+          for security and reliability. These are not used to identify or
+          profile visitors.
         </p>
       </PageSection>
 

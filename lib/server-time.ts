@@ -156,7 +156,12 @@ async function getOffset(): Promise<Offset> {
     inFlight = measureOffset()
       .then(
         (result) =>
-          result ?? { offsetMs: 0, rttMs: 0, at: Date.now(), source: "uncorrected" }
+          result ?? {
+            offsetMs: 0,
+            rttMs: 0,
+            at: Date.now(),
+            source: "uncorrected",
+          }
       )
       .finally(() => {
         inFlight = null

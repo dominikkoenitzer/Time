@@ -181,13 +181,14 @@ export function KineticClock() {
 
     const accentVec = hexToVec(ACCENT)
 
-    const stations: [React.RefObject<HTMLDivElement | null>, number, number][] = [
-      [s1Ref, 0.85, 1.95],
-      [s2Ref, 1.85, 2.95],
-      [s3Ref, 2.85, 3.95],
-      [s4Ref, 3.85, 4.95],
-      [s5Ref, 4.85, 6.05],
-    ]
+    const stations: [React.RefObject<HTMLDivElement | null>, number, number][] =
+      [
+        [s1Ref, 0.85, 1.95],
+        [s2Ref, 1.85, 2.95],
+        [s3Ref, 2.85, 3.95],
+        [s4Ref, 3.85, 4.95],
+        [s5Ref, 4.85, 6.05],
+      ]
 
     const easeIO = (x: number) =>
       x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2
@@ -386,7 +387,8 @@ export function KineticClock() {
         const A = 1.8 // fall → white-out
         if (dt < A) {
           const k = dt / A
-          collapse = (diveC0 || 0.5) + (1 - (diveC0 || 0.5)) * sstep(0, 0.35, dt)
+          collapse =
+            (diveC0 || 0.5) + (1 - (diveC0 || 0.5)) * sstep(0, 0.35, dt)
           dive = k * k * k // accelerating plunge
           flash = sstep(A - 0.45, A, dt)
           if (finaleRef.current) finaleRef.current.style.opacity = "0"
@@ -420,7 +422,9 @@ export function KineticClock() {
             wrapRef.current.style.filter = `blur(${(1 - ease) * 12}px)`
           }
           if (kickerRef.current)
-            kickerRef.current.style.opacity = String(Math.max(0, (ease - 0.45) / 0.55))
+            kickerRef.current.style.opacity = String(
+              Math.max(0, (ease - 0.45) / 0.55)
+            )
           if (dt2 > HOLD + D + 0.1) {
             diving = false
             reset = false
@@ -453,10 +457,12 @@ export function KineticClock() {
           ((doy - 1 + secsToday / 86400) / yearLen) *
           100
         ).toFixed(2)
-      if (weekRef.current) weekRef.current.textContent = String(getIsoWeek(wall))
+      if (weekRef.current)
+        weekRef.current.textContent = String(getIsoWeek(wall))
       if (doyRef.current) doyRef.current.textContent = String(doy)
       if (yearLenRef.current) yearLenRef.current.textContent = String(yearLen)
-      if (remainRef.current) remainRef.current.textContent = String(yearLen - doy)
+      if (remainRef.current)
+        remainRef.current.textContent = String(yearLen - doy)
       if (unixRef.current)
         unixRef.current.textContent = fmt(Math.floor(now.getTime() / 1000))
       if (onpageRef.current) {
@@ -592,8 +598,20 @@ export function KineticClock() {
         >
           <span>Fall through time</span>
           <svg width="11" height="20" viewBox="0 0 11 20" fill="none">
-            <line x1="5.5" y1="0" x2="5.5" y2="17" stroke="#6a6a62" strokeWidth="1" />
-            <path d="M1 13 L5.5 18 L10 13" stroke="#6a6a62" strokeWidth="1" fill="none" />
+            <line
+              x1="5.5"
+              y1="0"
+              x2="5.5"
+              y2="17"
+              stroke="#6a6a62"
+              strokeWidth="1"
+            />
+            <path
+              d="M1 13 L5.5 18 L10 13"
+              stroke="#6a6a62"
+              strokeWidth="1"
+              fill="none"
+            />
           </svg>
         </div>
 
@@ -615,7 +633,12 @@ export function KineticClock() {
           {RAIL.map((label) => (
             <div
               key={label}
-              style={{ display: "flex", alignItems: "center", gap: 11, justifyContent: "flex-end" }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 11,
+                justifyContent: "flex-end",
+              }}
             >
               <span className="rl" style={railLabel}>
                 {label}
@@ -630,13 +653,18 @@ export function KineticClock() {
           <div style={stationLabel}>The second</div>
           <div
             className="tabular-nums"
-            style={{ fontWeight: 500, letterSpacing: "-0.03em", fontSize: "clamp(26px, 8vw, 116px)", lineHeight: 0.92 }}
+            style={{
+              fontWeight: 500,
+              letterSpacing: "-0.03em",
+              fontSize: "clamp(26px, 8vw, 116px)",
+              lineHeight: 0.92,
+            }}
           >
             9,192,631,770
           </div>
           <div style={stationSub}>
-            oscillations of a caesium-133 atom define exactly one second. The clock
-            above is counting them — faithfully, forever.
+            oscillations of a caesium-133 atom define exactly one second. The
+            clock above is counting them — faithfully, forever.
           </div>
         </div>
 
@@ -644,11 +672,17 @@ export function KineticClock() {
         <div ref={s2Ref} style={station}>
           <div style={stationLabel}>Today</div>
           <div style={{ ...headline, maxWidth: "13ch" }}>
-            Today is <span className="tabular-nums" ref={todayPctRef}>0.0</span>% spent.
+            Today is{" "}
+            <span className="tabular-nums" ref={todayPctRef}>
+              0.0
+            </span>
+            % spent.
           </div>
           <div style={stationSub}>
-            <span className="tabular-nums" ref={untilRef}>00h 00m</span> until midnight —
-            then the count begins again.
+            <span className="tabular-nums" ref={untilRef}>
+              00h 00m
+            </span>{" "}
+            until midnight — then the count begins again.
           </div>
         </div>
 
@@ -657,13 +691,29 @@ export function KineticClock() {
           <div style={stationLabel}>This year</div>
           <div style={{ ...headline, maxWidth: "13ch" }}>
             <span ref={yearRef}>2026</span> is{" "}
-            <span className="tabular-nums" ref={yearPctRef}>0.00</span>% gone.
+            <span className="tabular-nums" ref={yearPctRef}>
+              0.00
+            </span>
+            % gone.
           </div>
           <div style={stationSub}>
-            Week <span className="tabular-nums" ref={weekRef}>0</span> · Day{" "}
-            <span className="tabular-nums" ref={doyRef}>0</span> of{" "}
-            <span className="tabular-nums" ref={yearLenRef}>365</span> ·{" "}
-            <span className="tabular-nums" ref={remainRef}>0</span> days still ahead of you.
+            Week{" "}
+            <span className="tabular-nums" ref={weekRef}>
+              0
+            </span>{" "}
+            · Day{" "}
+            <span className="tabular-nums" ref={doyRef}>
+              0
+            </span>{" "}
+            of{" "}
+            <span className="tabular-nums" ref={yearLenRef}>
+              365
+            </span>{" "}
+            ·{" "}
+            <span className="tabular-nums" ref={remainRef}>
+              0
+            </span>{" "}
+            days still ahead of you.
           </div>
         </div>
 
@@ -684,8 +734,8 @@ export function KineticClock() {
             0
           </div>
           <div style={stationSub}>
-            seconds since 1 January 1970 — a number that has only ever grown, and
-            never once paused.
+            seconds since 1 January 1970 — a number that has only ever grown,
+            and never once paused.
           </div>
         </div>
 
@@ -694,10 +744,14 @@ export function KineticClock() {
           <div style={stationLabel}>Right now</div>
           <div style={{ ...headline, maxWidth: "14ch" }}>
             You&apos;ve been here{" "}
-            <span className="tabular-nums" ref={onpageRef}>0 seconds</span>.
+            <span className="tabular-nums" ref={onpageRef}>
+              0 seconds
+            </span>
+            .
           </div>
           <div style={stationSub}>
-            …and that, too, is already in the past. Time well spent — now back to it.
+            …and that, too, is already in the past. Time well spent — now back
+            to it.
           </div>
         </div>
 
@@ -764,7 +818,12 @@ export function KineticClock() {
 
       {/* scroll spacer drives the whole sequence */}
       <div
-        style={{ position: "relative", zIndex: 1, height: "850vh", pointerEvents: "none" }}
+        style={{
+          position: "relative",
+          zIndex: 1,
+          height: "850vh",
+          pointerEvents: "none",
+        }}
       />
     </>
   )

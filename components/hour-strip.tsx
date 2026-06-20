@@ -19,7 +19,13 @@ function hourLabel(hour: number, minute: number, hour12: boolean) {
  * Today's 24 local hours next to the corresponding wall time in the target
  * zone — for spotting a good moment to call.
  */
-export function HourStrip({ timeZone, city }: { timeZone: string; city: string }) {
+export function HourStrip({
+  timeZone,
+  city,
+}: {
+  timeZone: string
+  city: string
+}) {
   const now = useNow()
   const { hour12 } = useTimeFormat()
   const scrollRef = React.useRef<HTMLDivElement>(null)
@@ -61,18 +67,23 @@ export function HourStrip({ timeZone, city }: { timeZone: string; city: string }
   const currentHour = now?.getHours()
 
   return (
-    <section aria-label={`Hour comparison with ${city}`} className="flex flex-col gap-4">
+    <section
+      aria-label={`Hour comparison with ${city}`}
+      className="flex flex-col gap-4"
+    >
       <h2 className="text-sm font-medium tracking-widest text-muted-foreground uppercase">
         Plan a call with {city}
       </h2>
       <div
         ref={scrollRef}
-        className="relative overflow-x-auto pb-1 [scrollbar-width:thin]"
+        className="relative [scrollbar-width:thin] overflow-x-auto pb-1"
       >
         <div className="flex w-max items-stretch gap-1">
           <div className="flex flex-col justify-around pr-2 text-xs text-muted-foreground">
             <span className="flex h-8 items-center">You</span>
-            <span className="flex h-8 max-w-24 items-center truncate">{city}</span>
+            <span className="flex h-8 max-w-24 items-center truncate">
+              {city}
+            </span>
           </div>
           {(cells ?? Array.from({ length: 24 }, (): null => null)).map(
             (cell, index) => (
