@@ -499,9 +499,9 @@ export function KineticClock() {
 
   return (
     <>
-      {/* Force this immersive route fully dark regardless of the site's theme:
-          overrides next-themes' light color-scheme and the white body bg. In the
-          SSR HTML, so it applies at first paint — no white scrollbar/flash. */}
+      {/* Pin this route to the exact kinetic backdrop and a dark color-scheme,
+          inline in the SSR HTML so it applies at first paint — no white
+          scrollbar/flash. */}
       <style>{`html,body{background:#08080a!important;overflow-x:hidden}html{color-scheme:dark!important}@media(max-width:640px){.kc-rail{display:none!important}}`}</style>
       <h1 className="sr-only">Time — the exact current time, anywhere</h1>
       <canvas
