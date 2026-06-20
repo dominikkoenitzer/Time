@@ -21,7 +21,7 @@ export default function OpenGraphImage() {
       }}
     >
       <div style={{ display: "flex", fontSize: 160, fontWeight: 600 }}>
-        12:00<span style={{ color: "#4d7cf6" }}>:00</span>
+        12:00<span style={{ color: "#c6f04a" }}>:00</span>
       </div>
       <div
         style={{
