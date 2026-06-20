@@ -92,6 +92,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for local setup, code-style notes, and th
 
 ## License
 
-© 2026 Dominik Könitzer. **All rights reserved.**
+© 2026 Dominik Könitzer. **All rights reserved.** See [LICENSE](LICENSE).
 
-This source is published for transparency and reference. No license is granted to reuse, redistribute, or create derivative works. If you'd like to use part of it, please open an issue and ask.
+This source is published for transparency and reference only. No license is granted to use, reuse, redistribute, or create derivative works from it. If you'd like to use part of it, please open an issue and ask.
