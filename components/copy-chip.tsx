@@ -44,7 +44,11 @@ export function CopyChip({
       )}
     >
       {children}
-      <HugeiconsIcon icon={copied ? Tick02Icon : Copy01Icon} size={12} strokeWidth={2} />
+      <HugeiconsIcon
+        icon={copied ? Tick02Icon : Copy01Icon}
+        size={12}
+        strokeWidth={2}
+      />
     </button>
   )
 }

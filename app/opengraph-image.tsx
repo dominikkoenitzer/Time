@@ -6,36 +6,34 @@ export const contentType = "image/png"
 
 export default function OpenGraphImage() {
   return new ImageResponse(
-    (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 24,
+        backgroundColor: "#0a0a0a",
+        color: "#fafafa",
+        fontFamily: "monospace",
+      }}
+    >
+      <div style={{ display: "flex", fontSize: 160, fontWeight: 600 }}>
+        12:00<span style={{ color: "#4d7cf6" }}>:00</span>
+      </div>
       <div
         style={{
-          width: "100%",
-          height: "100%",
           display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 24,
-          backgroundColor: "#0a0a0a",
-          color: "#fafafa",
-          fontFamily: "monospace",
+          fontSize: 36,
+          color: "#a3a3a3",
+          fontFamily: "sans-serif",
         }}
       >
-        <div style={{ display: "flex", fontSize: 160, fontWeight: 600 }}>
-          12:00<span style={{ color: "#4d7cf6" }}>:00</span>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            fontSize: 36,
-            color: "#a3a3a3",
-            fontFamily: "sans-serif",
-          }}
-        >
-          Time — the exact time, anywhere
-        </div>
+        Time — the exact time, anywhere
       </div>
-    ),
+    </div>,
     size
   )
 }

@@ -18,7 +18,10 @@ export function SyncStatus() {
   if (sync.status === "unavailable") {
     return (
       <p className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-        <span aria-hidden className="size-2 rounded-full bg-muted-foreground/30" />
+        <span
+          aria-hidden
+          className="size-2 rounded-full bg-muted-foreground/30"
+        />
         Couldn&apos;t reach the server to check your clock.
         <CheckAgainButton />
       </p>

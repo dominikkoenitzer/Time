@@ -30,7 +30,9 @@ export function WorldClocks() {
     const starred = favorites.map(
       (zone) => curated.get(zone) ?? { name: toZoneInfo(zone).city, zone }
     )
-    const rest = FEATURED_CITIES.filter((city) => !favorites.includes(city.zone))
+    const rest = FEATURED_CITIES.filter(
+      (city) => !favorites.includes(city.zone)
+    )
 
     return [...starred, ...rest]
   }, [favorites])
@@ -68,7 +70,7 @@ function CityCard({ city }: { city: City }) {
       : ""
 
   return (
-    <li className="group relative flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 transition-all hover:border-ring/40 hover:bg-muted/50 focus-within:ring-[3px] focus-within:ring-ring/50">
+    <li className="group relative flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 transition-all focus-within:ring-[3px] focus-within:ring-ring/50 hover:border-ring/40 hover:bg-muted/50">
       <Link
         href={`/${city.zone.toLowerCase()}`}
         aria-label={`Time in ${city.name}`}
@@ -90,7 +92,7 @@ function CityCard({ city }: { city: City }) {
               "relative z-10 cursor-pointer rounded-full transition-all outline-none focus-visible:opacity-100 focus-visible:ring-[3px] focus-visible:ring-ring/50",
               saved
                 ? "text-amber-500"
-                : "text-muted-foreground/40 opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 hover:text-amber-500"
+                : "text-muted-foreground/40 opacity-0 group-hover:opacity-100 hover:text-amber-500 pointer-coarse:opacity-100"
             )}
           >
             <HugeiconsIcon
