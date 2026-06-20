@@ -7,7 +7,6 @@ import {
 } from "next/font/google"
 
 import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site"
 import { cn } from "@/lib/utils"
 
@@ -57,10 +56,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-  ],
+  themeColor: "#0a0a0a",
 }
 
 export default function RootLayout({
@@ -73,6 +69,7 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
       className={cn(
+        "dark",
         "antialiased",
         "font-sans",
         figtree.variable,
@@ -81,9 +78,7 @@ export default function RootLayout({
         jetbrainsMono.variable
       )}
     >
-      <body>
-        <ThemeProvider>{children}</ThemeProvider>
-      </body>
+      <body>{children}</body>
     </html>
   )
 }
