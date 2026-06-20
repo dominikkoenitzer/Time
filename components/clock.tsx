@@ -155,7 +155,9 @@ export function Clock({
       </header>
 
       <p
-        aria-label={heading ? `Current time in ${heading}` : "Current local time"}
+        aria-label={
+          heading ? `Current time in ${heading}` : "Current local time"
+        }
         className="font-mono text-[clamp(3.5rem,16vw,11rem)] leading-none font-medium tracking-tight tabular-nums select-none"
       >
         {wall && displayHour !== null ? (
@@ -166,7 +168,7 @@ export function Clock({
             <span className="font-sans text-muted-foreground/30">:</span>
             <span className="text-time-accent">{pad(wall.second)}</span>
             {hour12 ? (
-              <span className="ml-3 align-middle text-[0.2em] font-sans font-semibold text-muted-foreground">
+              <span className="ml-3 align-middle font-sans text-[0.2em] font-semibold text-muted-foreground">
                 {dayPeriod(wall.hour)}
               </span>
             ) : null}

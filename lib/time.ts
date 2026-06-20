@@ -54,8 +54,9 @@ export function resolveZone(path: string): string | null {
   // Aliases missing from supportedValuesOf (e.g. Asia/Kolkata where ICU
   // lists Asia/Calcutta): accept anything Intl can canonicalize.
   try {
-    return new Intl.DateTimeFormat("en-US", { timeZone: slug }).resolvedOptions()
-      .timeZone
+    return new Intl.DateTimeFormat("en-US", {
+      timeZone: slug,
+    }).resolvedOptions().timeZone
   } catch {
     return null
   }
@@ -178,7 +179,10 @@ export function formatDate(date: Date, timeZone?: string): string {
  * "+7:30h" / "−6h" / "Same as local time".
  */
 export function formatZoneDifference(date: Date, timeZone: string): string {
-  const local = getOffsetMinutes(date, Intl.DateTimeFormat().resolvedOptions().timeZone)
+  const local = getOffsetMinutes(
+    date,
+    Intl.DateTimeFormat().resolvedOptions().timeZone
+  )
   const remote = getOffsetMinutes(date, timeZone)
   const diff = remote - local
 
