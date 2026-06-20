@@ -6,27 +6,27 @@ import { PageShell } from "@/components/page-shell"
 export const metadata: Metadata = {
   title: "FAQ",
   description:
-    "Frequently asked questions about Time: how the clock accuracy check works, what the ± margin means, and how to fix a drifting device clock.",
+    "Frequently asked questions about Time: how it synchronizes with the server, what the ± margin means, and which time zones are supported.",
 }
 
 const faqs = [
   {
-    question: "How does Time know if my clock is wrong?",
+    question: "How does Time stay accurate?",
     answer: (
       <>
         <p>
           When the page loads, your browser asks our server for the current time
           several times in a row. For each request we know exactly when it left
-          and when the answer arrived, so we can estimate the difference between
-          your device clock and the server clock — the same principle NTP uses
-          to synchronize computers worldwide.
+          and when the answer arrived, so we can measure the round trip and read
+          the server&apos;s time precisely — the same principle NTP uses to
+          synchronize computers worldwide.
         </p>
         <p>
           We keep the sample with the fastest round trip, because the less time
           the request spent on the network, the less room there is for error.
-          The clocks on this site are then corrected by that measurement — so
-          what you see is our best estimate of the true time, not just a copy of
-          your computer&apos;s clock.
+          The clocks on this site are corrected by that measurement — so what
+          you see is our best estimate of the true time, independent of the
+          device you are viewing it on.
         </p>
       </>
     ),
@@ -57,7 +57,7 @@ const faqs = [
     ),
   },
   {
-    question: "My clock is a few seconds off. How do I fix it?",
+    question: "How do I keep my computer's clock accurate?",
     answer: (
       <p>
         Enable automatic time synchronization in your operating system. On
@@ -114,7 +114,7 @@ const faqs = [
     question: "Do you collect my data?",
     answer: (
       <p>
-        No accounts, no tracking, no analytics. The accuracy check only
+        No accounts, no tracking, no analytics. Synchronizing the time only
         exchanges timestamps with the server. See the{" "}
         <Link
           href="/privacy"
@@ -132,7 +132,7 @@ export default function FaqPage() {
   return (
     <PageShell
       title="Frequently asked questions"
-      lead="Everything you might want to know about Time and the clock accuracy check."
+      lead="Everything you might want to know about Time and how it stays accurate."
     >
       <div className="flex flex-col gap-3">
         {faqs.map(({ question, answer }) => (
