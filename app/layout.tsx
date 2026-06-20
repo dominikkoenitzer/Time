@@ -31,22 +31,28 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-kinetic-mono",
 })
 
+const TITLE = `${SITE_NAME} — the exact time, anywhere`
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: {
-    default: `${SITE_NAME} — the exact time, anywhere`,
-    template: `%s · ${SITE_NAME}`,
-  },
+  title: TITLE,
   description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     siteName: SITE_NAME,
     type: "website",
+    locale: "en_US",
     url: "/",
-    title: `${SITE_NAME} — the exact time, anywhere`,
+    title: TITLE,
     description: SITE_DESCRIPTION,
   },
   twitter: {
     card: "summary_large_image",
+    title: TITLE,
+    description: SITE_DESCRIPTION,
   },
 }
 
