@@ -6,7 +6,7 @@ import { PageShell } from "@/components/page-shell"
 export const metadata: Metadata = {
   title: "FAQ",
   description:
-    "Frequently asked questions about Time: how it synchronizes with the server, what the ± margin means, and which time zones are supported.",
+    "Frequently asked questions about Time: how it stays accurate, which time zones it supports, and the keyboard shortcuts.",
 }
 
 const faqs = [
@@ -40,19 +40,6 @@ const faqs = [
         clock by hand, or a laptop waking from sleep — triggers an automatic
         re-synchronization. The measurement is also refreshed when you return to
         the tab after a while.
-      </p>
-    ),
-  },
-  {
-    question:
-      "What does “Accuracy of synchronization was ±0.023 seconds” mean?",
-    answer: (
-      <p>
-        It is the margin of error of the measurement itself. The server&apos;s
-        answer travels over the network, and we can&apos;t know whether it spent
-        more time on the way there or on the way back — so the true offset could
-        be up to half the round-trip time away from our estimate. We state that
-        bound instead of hiding it.
       </p>
     ),
   },
