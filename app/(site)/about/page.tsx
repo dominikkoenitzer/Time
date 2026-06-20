@@ -6,7 +6,7 @@ import { PageSection, PageShell } from "@/components/page-shell"
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Time shows server-corrected, second-accurate time for every time zone on earth — and is honest about how precise that is.",
+    "Time shows the exact, server-corrected current time, accurate to within hundredths of a second.",
 }
 
 export default function AboutPage() {
@@ -18,29 +18,16 @@ export default function AboutPage() {
       <PageSection heading="What you can do here">
         <ul className="list-disc space-y-1.5 pl-5">
           <li>
-            See the exact current time for every time zone in the IANA database
-            — search any city, or go straight to an address like{" "}
-            <Link
-              href="/europe/zurich"
-              className="text-foreground underline underline-offset-4"
-            >
-              /europe/zurich
-            </Link>{" "}
-            or{" "}
-            <Link
-              href="/tokyo"
-              className="text-foreground underline underline-offset-4"
-            >
-              /tokyo
-            </Link>
-            .
+            See the exact current time, synchronized to our server and accurate
+            to within hundredths of a second — even when the device you&apos;re
+            on has the wrong time.
           </li>
           <li>
-            Compare time across locations: world clocks for your favorite cities
-            and an hour-by-hour strip for planning calls.
+            Scroll the home page to fall through the clock — from this second
+            out to the day, the year, and the Unix epoch.
           </li>
           <li>
-            Use it as a wall clock — fullscreen mode keeps the screen awake.
+            Keep it open full-screen as an ambient, always-correct wall clock.
           </li>
         </ul>
       </PageSection>
@@ -64,10 +51,10 @@ export default function AboutPage() {
             the computer is busy, causing visible two-second jumps.
           </li>
           <li>
-            Time zones and daylight saving rules come from the IANA Time Zone
-            Database, applied automatically — DST transitions are shown
-            correctly even if your computer&apos;s clock isn&apos;t aware of
-            them.
+            Your local time zone and its daylight-saving rules come from your
+            browser&apos;s built-in data, applied automatically — so the date
+            stays correct across DST changes even if your computer&apos;s clock
+            isn&apos;t aware of them.
           </li>
           <li>
             If you adjust your computer clock, or come back to a laptop that was

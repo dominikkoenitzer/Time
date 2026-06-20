@@ -16,21 +16,14 @@ Time shows the precise, server-corrected current time — synchronized the same 
 ## Features
 
 - **Synchronized, accurate time (the point of the site).** An NTP-style measurement samples the server several times and keeps the lowest round-trip sample, so the displayed time is corrected to within hundredths of a second of the true time — automatically, with nothing to click.
-- **Server-corrected time everywhere.** Every clock on the site is drawn from the measured server offset, so the displayed time stays correct even if the device it runs on is set wrong.
-- **Any timezone, clean URLs.** Full IANA paths like `/europe/zurich` or bare city names like `/tokyo` resolve to a live local clock with date, UTC offset and ISO week.
-- **World clock comparison** and a curated grid of featured cities.
-- **Favorites and recently viewed** zones, persisted locally in your browser.
-- **12/24-hour, light/dark, and a fullscreen clock**, all keyboard-driven.
-- **No external time APIs and no timezone data files** — all timezone math is done client-side with the built-in `Intl` APIs. The server's only job is the `/api/time` endpoint, which returns NTP-disciplined true UTC for the sync check.
+- **Server-corrected time everywhere.** The displayed clock is drawn from the measured server offset, so it stays right even if the device it runs on is set wrong.
+- **A kinetic home page.** Scroll to fall through the clock — from this second out to the day, the year, and the Unix epoch.
+- **Light / dark theme**, remembered across visits (press `D` to toggle).
+- **No external time APIs and no timezone data files** — the current time is computed client-side with the built-in `Intl` APIs. The server's only job is the `/api/time` endpoint, which returns NTP-disciplined true UTC for the sync check.
 
 ## Keyboard shortcuts
 
-| Key             | Action                  |
-| --------------- | ----------------------- |
-| `D`             | Toggle light / dark     |
-| `T`             | Toggle 12 / 24-hour     |
-| `F`             | Fullscreen clock        |
-| `/` or `Ctrl/⌘ + K` | Focus timezone search |
+Press `D` anywhere to toggle light / dark mode.
 
 ## Tech stack
 
@@ -76,10 +69,9 @@ The site needs no environment variables to run. One optional variable is support
 | --------------------- | ----------------------------------------------------------------------- |
 | `app/`                | App Router routes, layout, metadata, sitemap, robots, OG image          |
 | `app/api/time/`       | The one server endpoint — returns NTP-disciplined true UTC for the sync check |
-| `app/[...zone]/`      | Catch-all that resolves IANA paths and bare city names to a clock       |
-| `components/`         | UI — clock, timezone search, world clocks, header/footer                |
-| `hooks/`              | Live-time ticking and 12/24-hour preference                             |
-| `lib/`                | Timezone math (`time.ts`), client clock sync (`clock-sync.ts`), server NTP discipline (`server-time.ts`), local stores, site config |
+| `components/`         | UI — the kinetic clock, live tab title, header/footer, page shell        |
+| `hooks/`              | Live-time ticking (`use-now.ts`)                                         |
+| `lib/`                | Wall-clock helpers (`time.ts`), client clock sync (`clock-sync.ts`), server NTP discipline (`server-time.ts`), site config (`site.ts`) |
 | `public/`             | Static assets                                                           |
 
 ## How synchronization works
