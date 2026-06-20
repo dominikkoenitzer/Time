@@ -503,6 +503,7 @@ export function KineticClock() {
           overrides next-themes' light color-scheme and the white body bg. In the
           SSR HTML, so it applies at first paint — no white scrollbar/flash. */}
       <style>{`html,body{background:#08080a!important;overflow-x:hidden}html{color-scheme:dark!important}@media(max-width:640px){.kc-rail{display:none!important}}`}</style>
+      <h1 className="sr-only">Time — the exact current time, anywhere</h1>
       <canvas
         ref={canvasRef}
         aria-hidden
@@ -597,7 +598,13 @@ export function KineticClock() {
           }}
         >
           <span>Fall through time</span>
-          <svg width="11" height="20" viewBox="0 0 11 20" fill="none">
+          <svg
+            width="11"
+            height="20"
+            viewBox="0 0 11 20"
+            fill="none"
+            aria-hidden
+          >
             <line
               x1="5.5"
               y1="0"
