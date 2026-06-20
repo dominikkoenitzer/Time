@@ -28,8 +28,7 @@ export default function TermsPage() {
 
       <PageSection heading="No guarantee of accuracy">
         <p>
-          We work hard to show the most accurate time we can, and we
-          transparently state the measured margin of error. Even so, the
+          We work hard to show the most accurate time we can. Even so, the
           displayed time ultimately depends on your device, your network, and
           our server. Do not rely on this site for safety-critical,
           legal-deadline, financial, or other timing-sensitive decisions.
