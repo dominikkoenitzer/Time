@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions & Discussions
+    url: https://github.com/dominikkoenitzer/Time/discussions
+    about: Ask a question, share an idea, or discuss the project.
+  - name: Security report
+    url: https://github.com/dominikkoenitzer/Time/security/advisories/new
+    about: Report a vulnerability privately. Please do not file it as a public issue.
