@@ -1,14 +1,15 @@
 "use client"
 
+import Lenis from "lenis"
 import * as React from "react"
 
 import { correctedNowMs, ensureClockSync } from "@/lib/clock-sync"
 import { getDayOfYear, getIsoWeek, getWallClock, pad } from "@/lib/time"
 
 // Single accent — drives the shader field, the live rail dot, the active rail
-// label, and the accretion-ring glow. Kept clear of the site's blue; the
-// design's palette was lime / teal / amber / periwinkle / rose.
-const ACCENT = "#c6f04a" // lime — matches the reference design
+// label, and the accretion-ring glow. A muted sage rather than a vivid hue, so
+// the field reads calm instead of electric.
+const ACCENT = "#a3bd93" // muted sage
 
 function hexToVec(hex: string): [number, number, number] {
   const h = hex.replace("#", "")
@@ -53,7 +54,7 @@ const FRAG = `
 
     // Clean hero: at rest the field is pure background (no texture/effects). Once
     // you start scrolling it fades in — gray first, then climbing into the
-    // lime/gold field deeper down.
+    // muted sage field deeper down.
     float lum = dot(col, vec3(0.2126, 0.7152, 0.0722));
     float reveal = smoothstep(0.0, 0.7, u_phase);
     float colorAmt = smoothstep(0.8, 3.0, u_phase);
@@ -98,7 +99,7 @@ const station: React.CSSProperties = {
   opacity: 0,
   willChange: "opacity, transform",
   // Dark shadow (inherited by all station text) so captions stay legible over
-  // the bright lime/gold field.
+  // the bright sage field.
   textShadow: "0 1px 4px rgba(0, 0, 0, 0.85), 0 0 18px rgba(0, 0, 0, 0.5)",
 }
 const stationLabel: React.CSSProperties = {
@@ -170,6 +171,17 @@ export function KineticClock() {
 
   React.useEffect(() => {
     ensureClockSync()
+
+    // Smooth scroll. Lenis drives the real document scroll, so window.scrollY
+    // and native scroll events — which the whole timeline below reads — keep
+    // working untouched; it just glides between positions. Disabled when the
+    // visitor prefers reduced motion.
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches
+    const lenis = reduceMotion
+      ? null
+      : new Lenis({ lerp: 0.09, smoothWheel: true })
 
     const mount = performance.now()
     const canvas = canvasRef.current
@@ -315,10 +327,9 @@ export function KineticClock() {
     let uAccent: WebGLUniformLocation | null = null
 
     if (gl && canvas) {
-      // Render the field in Display P3 to reproduce the original's vivid lime —
-      // the design preview draws wide-gamut, which is where the punch comes
-      // from. On P3-capable displays this matches the original; sRGB-only
-      // displays clamp to their gamut. Accent stays #c6f04a, background #08080a.
+      // Render the field in Display P3 so the sage reproduces faithfully on
+      // wide-gamut displays; sRGB-only displays clamp to their gamut. Accent is
+      // #a3bd93, background #08080a.
       gl.drawingBufferColorSpace = "display-p3"
       gl.unpackColorSpace = "display-p3"
 
@@ -362,7 +373,9 @@ export function KineticClock() {
     }
 
     let raf = 0
-    const frame = () => {
+    const frame = (time: number) => {
+      lenis?.raf(time)
+
       const now = new Date(correctedNowMs())
       const h = now.getHours()
       const m = now.getMinutes()
@@ -398,7 +411,10 @@ export function KineticClock() {
           // crossed the horizon
           reset = true
           rebornStart = pnow
-          window.scrollTo(0, 0)
+          // Snap back to the top through Lenis so its internal target stays in
+          // sync (a raw window.scrollTo would fight the smoothing).
+          if (lenis) lenis.scrollTo(0, { immediate: true, force: true })
+          else window.scrollTo(0, 0)
           collapse = 0
           dive = 0
           flash = 1
@@ -494,6 +510,7 @@ export function KineticClock() {
       cancelAnimationFrame(raf)
       window.removeEventListener("scroll", updateOverlay)
       window.removeEventListener("resize", resize)
+      lenis?.destroy()
     }
   }, [])
 
