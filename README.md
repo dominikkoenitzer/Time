@@ -11,6 +11,8 @@ Time shows the precise, server-corrected current time — synchronized the same 
 
 **Live:** [time.punds.ch](https://time.punds.ch)
 
+<img src="docs/screenshot.png" alt="Time — the synchronized clock" width="880" />
+
 ---
 
 ## Features
