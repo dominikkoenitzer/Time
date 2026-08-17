@@ -84,3 +84,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for local setup, code-style notes, and th
 © 2026 Dominik Könitzer. **All rights reserved.** See [LICENSE](LICENSE).
 
 This source is published for transparency and reference only. No license is granted to use, reuse, redistribute, or create derivative works from it. If you'd like to use part of it, please open an issue and ask.
+
+## Author
+
+**Dominik Könitzer** — software engineer in Zürich, Switzerland.
+
+[dominikkoenitzer.ch](https://dominikkoenitzer.ch) · [@dominikkoenitzer](https://github.com/dominikkoenitzer) · [dominik.koenitzer@gmail.com](mailto:dominik.koenitzer@gmail.com)
