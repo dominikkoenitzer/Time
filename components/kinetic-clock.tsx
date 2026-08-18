@@ -4,141 +4,26 @@ import Lenis from "lenis"
 import * as React from "react"
 
 import { correctedNowMs, ensureClockSync } from "@/lib/clock-sync"
-import { getDayOfYear, getIsoWeek, getWallClock, pad } from "@/lib/time"
+import { easeIO, sstep } from "@/lib/kinetic/easing"
+import { ACCENT, createField } from "@/lib/kinetic/field"
+import {
+  daysInYear,
+  getDayOfYear,
+  getIsoWeek,
+  getWallClock,
+  pad,
+} from "@/lib/time"
 
-// Single accent — drives the shader field, the live rail dot, the active rail
-// label, and the accretion-ring glow. A muted sage rather than a vivid hue, so
-// the field reads calm instead of electric.
-const ACCENT = "#a3bd93" // muted sage
-
-function hexToVec(hex: string): [number, number, number] {
-  const h = hex.replace("#", "")
-  return [
-    parseInt(h.slice(0, 2), 16) / 255,
-    parseInt(h.slice(2, 4), 16) / 255,
-    parseInt(h.slice(4, 6), 16) / 255,
-  ]
-}
-
-const VERT = `attribute vec2 a; void main(){ gl_Position = vec4(a,0.,1.); }`
-
-const FRAG = `
-  precision highp float;
-  uniform vec2 u_res; uniform float u_time; uniform float u_scroll;
-  uniform float u_scroll2; uniform float u_pulse; uniform float u_phase; uniform float u_collapse; uniform float u_dive; uniform vec3 u_accent;
-  float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453); }
-  float noise(vec2 p){ vec2 i=floor(p), f=fract(p); vec2 u=f*f*(3.-2.*f);
-    return mix(mix(hash(i),hash(i+vec2(1,0)),u.x), mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),u.x), u.y); }
-  float fbm(vec2 p){ float v=0.,a=.5; for(int i=0;i<6;i++){ v+=a*noise(p); p*=2.03; a*=.5;} return v; }
-  void main(){
-    vec2 uv=(gl_FragCoord.xy - .5*u_res)/u_res.y;
-    uv *= 1.0/(1.0 + u_dive*7.0);   // plunge toward the singularity
-    float ang=u_phase*0.10; mat2 rot=mat2(cos(ang),-sin(ang),sin(ang),cos(ang)); uv=rot*uv;
-    float t=u_time*0.05;
-    float sc=u_scroll;
-    float fr=1.4 + u_phase*0.16;
-    vec2 q=vec2(fbm(uv*fr + vec2(0.,t)), fbm(uv*fr + vec2(5.2,t*1.3)));
-    vec2 r=vec2(fbm(uv*fr + 3.*q + vec2(1.7,9.2) - t*0.5), fbm(uv*fr + 3.*q + vec2(8.3,2.8) + t*0.4));
-    float f=fbm(uv*fr + (2.5+1.5*sc)*r);
-    vec3 base=vec3(0.02,0.02,0.028);
-    vec3 col=mix(base, u_accent, clamp(f*1.45,0.,1.));
-    col=mix(col, vec3(0.95), pow(clamp(f,0.,1.),3.0)*0.55);
-    float energy=mix(0.14, 1.0, smoothstep(0.,1.,sc));
-    col*=energy;
-    col += u_accent * 0.18 * u_scroll2 * (0.5+0.5*sin(f*22. + u_time*1.5));
-    col += u_accent * 0.05 * u_pulse;
-    col *= (0.82 + 0.18*cos(vec3(0.,2.1,4.2) + u_phase*0.55));
-    float vig=smoothstep(1.5,0.12,length(uv));
-    col*=vig*0.66+0.34;
-    col*=mix(0.22,1.0, smoothstep(0.0,0.55,sc));
-
-    // Clean hero: at rest the field is pure background (no texture/effects). Once
-    // you start scrolling it fades in — gray first, then climbing into the
-    // muted sage field deeper down.
-    float lum = dot(col, vec3(0.2126, 0.7152, 0.0722));
-    float reveal = smoothstep(0.0, 0.7, u_phase);
-    float colorAmt = smoothstep(0.8, 3.0, u_phase);
-    vec3 field = mix(vec3(lum) * 0.45, col, colorAmt);
-    col = mix(vec3(0.031, 0.031, 0.039), field, reveal);
-
-    // ---- SINGULARITY ----
-    float cps = u_collapse;
-    if (cps > 0.001) {
-      float cr = length(uv);
-      float cang = atan(uv.y, uv.x);
-      float hor = mix(0.0, 0.11, smoothstep(0.0,0.45,cps));
-      float sw = cps*(0.95/(cr+0.08)) + u_time*0.25*cps;
-      float ar = cang + sw;
-      vec2 dc = vec2(cos(ar), sin(ar)) * pow(cr, mix(1.0,0.62,cps));
-      float disk = fbm(dc*4.2 + vec2(u_time*0.3,0.0));
-      vec3 bh = u_accent * (0.32 + disk*1.55);
-      float ringR = hor*1.7 + 0.015;
-      float ring = exp(-pow((cr-ringR)/(0.05+0.02*cps),2.0));
-      bh += (u_accent*1.35 + vec3(0.45)) * ring * (0.5+0.65*cos(ar));
-      bh += vec3(0.75,0.82,1.0) * exp(-pow((cr-ringR*0.82)/0.035,2.0)) * 0.6;
-      bh += u_accent * 0.16 * cps * pow(max(0.0,sin(cang*28.0 + sw*2.0)),4.0) * smoothstep(0.7,hor,cr);
-      bh *= smoothstep(hor*0.88, hor*1.06, cr);
-      col = mix(col, bh, cps);
-      col *= mix(1.0, smoothstep(1.3,0.06,cr), cps*0.72);
-    }
-
-    gl_FragColor=vec4(col,1.);
-  }`
-
-const mono = "var(--font-kinetic-mono)"
-
-const station: React.CSSProperties = {
-  position: "absolute",
-  inset: 0,
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  textAlign: "center",
-  padding: "0 40px",
-  opacity: 0,
-  willChange: "opacity, transform",
-  // Dark shadow (inherited by all station text) so captions stay legible over
-  // the bright sage field.
-  textShadow: "0 1px 4px rgba(0, 0, 0, 0.85), 0 0 18px rgba(0, 0, 0, 0.5)",
-}
-const stationLabel: React.CSSProperties = {
-  fontFamily: mono,
-  fontSize: 11,
-  letterSpacing: "0.28em",
-  textTransform: "uppercase",
-  color: "#cfcfc7",
-  marginBottom: 28,
-}
-const stationSub: React.CSSProperties = {
-  fontFamily: mono,
-  fontSize: 13,
-  lineHeight: 1.75,
-  color: "#deded7",
-  maxWidth: 540,
-  marginTop: 30,
-}
-const headline: React.CSSProperties = {
-  fontWeight: 500,
-  letterSpacing: "-0.025em",
-  fontSize: "clamp(30px, 6.4vw, 92px)",
-  lineHeight: 1.02,
-}
-const railLabel: React.CSSProperties = {
-  fontFamily: mono,
-  fontSize: 10,
-  letterSpacing: "0.14em",
-  textTransform: "uppercase",
-  color: "#5a5a54",
-}
-const railDot: React.CSSProperties = {
-  width: 6,
-  height: 6,
-  borderRadius: "50%",
-  border: "1px solid #4a4a44",
-}
-
-const RAIL = ["The second", "Today", "This year", "The epoch", "Right now"]
+import {
+  headline,
+  mono,
+  RAIL,
+  railDot,
+  railLabel,
+  station,
+  stationLabel,
+  stationSub,
+} from "./kinetic-clock.styles"
 
 export function KineticClock() {
   const canvasRef = React.useRef<HTMLCanvasElement>(null)
@@ -185,13 +70,7 @@ export function KineticClock() {
 
     const mount = performance.now()
     const canvas = canvasRef.current
-    const gl = canvas?.getContext("webgl", {
-      antialias: false,
-      alpha: false,
-      preserveDrawingBuffer: false,
-    })
-
-    const accentVec = hexToVec(ACCENT)
+    const field = canvas ? createField(canvas) : null
 
     const stations: [React.RefObject<HTMLDivElement | null>, number, number][] =
       [
@@ -202,12 +81,6 @@ export function KineticClock() {
         [s5Ref, 4.85, 6.05],
       ]
 
-    const easeIO = (x: number) =>
-      x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2
-    const sstep = (a: number, b: number, x: number) => {
-      x = Math.min(1, Math.max(0, (x - a) / (b - a)))
-      return x * x * (3 - 2 * x)
-    }
     const fmt = (n: number) => n.toLocaleString("en-US")
 
     let p = 0
@@ -308,69 +181,8 @@ export function KineticClock() {
     updateOverlay()
     window.addEventListener("scroll", updateOverlay, { passive: true })
 
-    const resize = () => {
-      if (!gl || !canvas) return
-      const dpr = Math.min(window.devicePixelRatio || 1, 2)
-      canvas.width = Math.floor(canvas.clientWidth * dpr)
-      canvas.height = Math.floor(canvas.clientHeight * dpr)
-      gl.viewport(0, 0, canvas.width, canvas.height)
-    }
-
-    let uRes: WebGLUniformLocation | null = null
-    let uTime: WebGLUniformLocation | null = null
-    let uScroll: WebGLUniformLocation | null = null
-    let uScroll2: WebGLUniformLocation | null = null
-    let uPulse: WebGLUniformLocation | null = null
-    let uPhase: WebGLUniformLocation | null = null
-    let uCollapse: WebGLUniformLocation | null = null
-    let uDive: WebGLUniformLocation | null = null
-    let uAccent: WebGLUniformLocation | null = null
-
-    if (gl && canvas) {
-      // Render the field in Display P3 so the sage reproduces faithfully on
-      // wide-gamut displays; sRGB-only displays clamp to their gamut. Accent is
-      // #a3bd93, background #08080a.
-      gl.drawingBufferColorSpace = "display-p3"
-      gl.unpackColorSpace = "display-p3"
-
-      const vsh = gl.createShader(gl.VERTEX_SHADER)
-      const fsh = gl.createShader(gl.FRAGMENT_SHADER)
-      const prog = gl.createProgram()
-      if (vsh && fsh && prog) {
-        gl.shaderSource(vsh, VERT)
-        gl.compileShader(vsh)
-        gl.shaderSource(fsh, FRAG)
-        gl.compileShader(fsh)
-        gl.attachShader(prog, vsh)
-        gl.attachShader(prog, fsh)
-        gl.linkProgram(prog)
-        gl.useProgram(prog)
-
-        const buf = gl.createBuffer()
-        gl.bindBuffer(gl.ARRAY_BUFFER, buf)
-        gl.bufferData(
-          gl.ARRAY_BUFFER,
-          new Float32Array([-1, -1, 3, -1, -1, 3]),
-          gl.STATIC_DRAW
-        )
-        const loc = gl.getAttribLocation(prog, "a")
-        gl.enableVertexAttribArray(loc)
-        gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0)
-
-        uRes = gl.getUniformLocation(prog, "u_res")
-        uTime = gl.getUniformLocation(prog, "u_time")
-        uScroll = gl.getUniformLocation(prog, "u_scroll")
-        uScroll2 = gl.getUniformLocation(prog, "u_scroll2")
-        uPulse = gl.getUniformLocation(prog, "u_pulse")
-        uPhase = gl.getUniformLocation(prog, "u_phase")
-        uCollapse = gl.getUniformLocation(prog, "u_collapse")
-        uDive = gl.getUniformLocation(prog, "u_dive")
-        uAccent = gl.getUniformLocation(prog, "u_accent")
-
-        resize()
-        window.addEventListener("resize", resize)
-      }
-    }
+    const resize = () => field?.resize()
+    if (field) window.addEventListener("resize", resize)
 
     let raf = 0
     const frame = (time: number) => {
@@ -455,10 +267,7 @@ export function KineticClock() {
 
       const secsToday = h * 3600 + m * 60 + s
       const wall = getWallClock(now)
-      const yearLen =
-        (wall.year % 4 === 0 && wall.year % 100 !== 0) || wall.year % 400 === 0
-          ? 366
-          : 365
+      const yearLen = daysInYear(wall.year)
       const doy = getDayOfYear(wall)
 
       if (todayPctRef.current)
@@ -489,18 +298,14 @@ export function KineticClock() {
             : `${Math.floor(el / 60)}m ${pad(el % 60)}s`
       }
 
-      if (gl && canvas) {
-        gl.uniform2f(uRes, canvas.width, canvas.height)
-        gl.uniform1f(uTime, performance.now() / 1000)
-        gl.uniform1f(uScroll, p)
-        gl.uniform1f(uScroll2, p2)
-        gl.uniform1f(uPulse, Math.pow(1 - ms / 1000, 3))
-        gl.uniform1f(uPhase, phase)
-        gl.uniform1f(uCollapse, collapse)
-        gl.uniform1f(uDive, dive)
-        gl.uniform3f(uAccent, accentVec[0], accentVec[1], accentVec[2])
-        gl.drawArrays(gl.TRIANGLES, 0, 3)
-      }
+      field?.draw({
+        scroll: p,
+        scroll2: p2,
+        pulse: Math.pow(1 - ms / 1000, 3),
+        phase,
+        collapse,
+        dive,
+      })
 
       raf = requestAnimationFrame(frame)
     }
