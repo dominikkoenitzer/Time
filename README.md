@@ -5,7 +5,7 @@
 Time shows the precise, server-corrected current time — synchronized the same way NTP works, so it stays right even when the device you're viewing it on is set wrong. The home page is one immersive scene: scroll to fall through the second, the day, the year, and the Unix epoch.
 
 [![CI](https://github.com/dominikkoenitzer/Time/actions/workflows/ci.yml/badge.svg)](https://github.com/dominikkoenitzer/Time/actions/workflows/ci.yml)
-[![tests](https://img.shields.io/badge/tests-22%20passing-3178c6)](lib/time.test.ts)
+[![tests](https://img.shields.io/badge/tests-34%20passing-3178c6)](lib/time.test.ts)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=nextdotjs)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss&logoColor=white)
@@ -57,7 +57,9 @@ bun run dev        # dev server at http://localhost:1000
 > The tests cover the parts that are easy to get quietly wrong: the NTP offset
 > maths (including that a sample's error is bounded by half the round trip, and
 > that the lowest-latency sample wins rather than an average), ISO-8601 week
-> numbers across year boundaries, leap-year day-of-year, and timezone conversion.
+> numbers across year boundaries, leap-year day-of-year and year length
+> (including the century rule), timezone conversion, and the scroll easing
+> curves that drive the home page.
 
 ### Configuration
 
@@ -76,6 +78,7 @@ The site needs no environment variables to run. One optional variable is support
 | `components/`         | UI — the kinetic clock (`kinetic-clock.tsx`), the live tab title, the shadcn button |
 | `hooks/`              | Live-time ticking (`use-now.ts`)                                         |
 | `lib/`                | Wall-clock helpers (`time.ts`), client clock sync (`clock-sync.ts`), server NTP discipline (`server-time.ts`), site config (`site.ts`) |
+| `lib/kinetic/`        | The home page's field: the WebGL shader and its handle (`field.ts`), the scroll easing curves (`easing.ts`) |
 | `public/`             | Static assets                                                           |
 
 ## How synchronization works

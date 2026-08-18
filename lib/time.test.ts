@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest"
 
 import { pickBestSample, sampleOffsetMs, type SyncSample } from "./clock-sync"
-import { getDayOfYear, getIsoWeek, getWallClock, pad } from "./time"
+import { easeIO, sstep } from "./kinetic/easing"
+import { daysInYear, getDayOfYear, getIsoWeek, getWallClock, pad } from "./time"
 
 const wall = (year: number, month: number, day: number) => ({
   year,
@@ -168,5 +169,98 @@ describe("getWallClock", () => {
     expect(getWallClock(new Date("2026-08-17T00:15:00.000Z"), "UTC").hour).toBe(
       0
     )
+  })
+})
+
+describe("daysInYear", () => {
+  it("is 365 in a common year", () => {
+    expect(daysInYear(2026)).toBe(365)
+    expect(daysInYear(2025)).toBe(365)
+  })
+
+  it("is 366 in a leap year", () => {
+    expect(daysInYear(2024)).toBe(366)
+    expect(daysInYear(2020)).toBe(366)
+  })
+
+  it("applies the century rule", () => {
+    // Divisible by 4 but not a leap year — the case a naive `% 4` gets wrong.
+    expect(daysInYear(1900)).toBe(365)
+    expect(daysInYear(2100)).toBe(365)
+    // Divisible by 400, so it is one after all.
+    expect(daysInYear(2000)).toBe(366)
+    expect(daysInYear(2400)).toBe(366)
+  })
+
+  it("agrees with the day-of-year count for December 31st", () => {
+    for (const year of [1900, 2000, 2020, 2024, 2025, 2026, 2100]) {
+      expect(getDayOfYear({ ...wall(year, 12, 31) })).toBe(daysInYear(year))
+    }
+  })
+})
+
+describe("easeIO", () => {
+  it("is pinned at both ends and passes through the midpoint", () => {
+    expect(easeIO(0)).toBe(0)
+    expect(easeIO(1)).toBe(1)
+    expect(easeIO(0.5)).toBeCloseTo(0.5, 10)
+  })
+
+  it("rises monotonically", () => {
+    let prev = -Infinity
+    for (let i = 0; i <= 100; i++) {
+      const v = easeIO(i / 100)
+      expect(v).toBeGreaterThanOrEqual(prev)
+      prev = v
+    }
+  })
+
+  it("is symmetric about the midpoint", () => {
+    for (const x of [0.1, 0.25, 0.4]) {
+      expect(easeIO(x) + easeIO(1 - x)).toBeCloseTo(1, 10)
+    }
+  })
+})
+
+describe("sstep", () => {
+  it("clamps outside the thresholds rather than running away", () => {
+    expect(sstep(0.2, 0.8, 0)).toBe(0)
+    expect(sstep(0.2, 0.8, -5)).toBe(0)
+    expect(sstep(0.2, 0.8, 1)).toBe(1)
+    expect(sstep(0.2, 0.8, 99)).toBe(1)
+  })
+
+  it("hits the thresholds exactly", () => {
+    expect(sstep(0.2, 0.8, 0.2)).toBe(0)
+    expect(sstep(0.2, 0.8, 0.8)).toBe(1)
+  })
+
+  it("is half way at the midpoint of the band", () => {
+    expect(sstep(0.2, 0.8, 0.5)).toBeCloseTo(0.5, 10)
+    expect(sstep(6.1, 7.3, 6.7)).toBeCloseTo(0.5, 10)
+  })
+
+  it("rises monotonically across the band", () => {
+    let prev = -Infinity
+    for (let i = 0; i <= 100; i++) {
+      const v = sstep(0.2, 0.8, i / 100)
+      expect(v).toBeGreaterThanOrEqual(prev)
+      prev = v
+    }
+  })
+
+  it("never leaves 0..1, whatever the band", () => {
+    for (const [a, b] of [
+      [0, 1],
+      [0.55, 1.15],
+      [6.1, 7.3],
+      [-2, 3],
+    ]) {
+      for (let i = -20; i <= 120; i++) {
+        const v = sstep(a, b, i / 10)
+        expect(v).toBeGreaterThanOrEqual(0)
+        expect(v).toBeLessThanOrEqual(1)
+      }
+    }
   })
 })
