@@ -78,7 +78,12 @@ export default function RootLayout({
         jetbrainsMono.variable
       )}
     >
-      <body>{children}</body>
+      <body>
+        {/* Everything on the page is the clock, so it all belongs to one main
+            landmark — without it none of the content sits in a region a screen
+            reader can jump to. */}
+        <main>{children}</main>
+      </body>
     </html>
   )
 }
