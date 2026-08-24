@@ -12,7 +12,7 @@
 
 ## How was this tested?
 
-<!-- There is no automated test suite — describe how you ran the app and verified the change. -->
+<!-- There is no automated test suite, so describe how you ran the app and verified the change. -->
 
 ## Checklist
 

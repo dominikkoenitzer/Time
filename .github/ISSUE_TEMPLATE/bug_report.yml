@@ -62,6 +62,6 @@ body:
     id: extra
     attributes:
       label: Screenshots or console output
-      description: Anything else that helps — screenshots, console errors, etc.
+      description: Anything else that helps: screenshots, console errors, etc.
     validations:
       required: false
