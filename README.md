@@ -1,8 +1,8 @@
 # Time
 
-**The exact time, anywhere — synchronized with the server and accurate to within hundredths of a second.**
+**The exact time, anywhere. Synchronized with the server and accurate to within hundredths of a second.**
 
-Time shows the precise, server-corrected current time — synchronized the same way NTP works, so it stays right even when the device you're viewing it on is set wrong. The home page is one immersive scene: scroll to fall through the second, the day, the year, and the Unix epoch.
+Time shows the precise, server-corrected current time, synchronized the same way NTP works, so it stays right even when the device you're viewing it on is set wrong. The home page is one immersive scene: scroll to fall through the second, the day, the year, and the Unix epoch.
 
 [![CI](https://github.com/dominikkoenitzer/Time/actions/workflows/ci.yml/badge.svg)](https://github.com/dominikkoenitzer/Time/actions/workflows/ci.yml)
 [![tests](https://img.shields.io/badge/tests-34%20passing-3178c6)](lib/time.test.ts)
@@ -12,16 +12,16 @@ Time shows the precise, server-corrected current time — synchronized the same 
 
 **Live:** [time.punds.ch](https://time.punds.ch)
 
-<img src="docs/screenshot.png" alt="Time — the synchronized clock" width="880" />
+<img src="docs/screenshot.png" alt="Time: the synchronized clock" width="880" />
 
 ---
 
 ## Features
 
-- **Synchronized, accurate time (the point of the site).** An NTP-style measurement samples the server several times and keeps the lowest round-trip sample, so the displayed time is corrected to within hundredths of a second of the true time — automatically, with nothing to click.
+- **Synchronized, accurate time (the point of the site).** An NTP-style measurement samples the server several times and keeps the lowest round-trip sample, so the displayed time is corrected to within hundredths of a second of the true time, automatically and with nothing to click.
 - **Server-corrected time everywhere.** The displayed clock is drawn from the measured server offset, so it stays right even if the device it runs on is set wrong.
-- **A kinetic home page.** Scroll to fall through the clock — from this second out to the day, the year, and the Unix epoch, rendered with a live WebGL field.
-- **No external time APIs and no timezone data files** — the current time is computed client-side with the built-in `Intl` APIs. The server's only job is the `/api/time` endpoint, which returns NTP-disciplined true UTC for the sync check.
+- **A kinetic home page.** Scroll to fall through the clock, from this second out to the day, the year and the Unix epoch, rendered with a live WebGL field.
+- **No external time APIs and no timezone data files.** The current time is computed client-side with the built-in `Intl` APIs. The server's only job is the `/api/time` endpoint, which returns NTP-disciplined true UTC for the sync check.
 
 ## Tech stack
 
@@ -74,8 +74,8 @@ The site needs no environment variables to run. One optional variable is support
 | Path                  | What lives there                                                        |
 | --------------------- | ----------------------------------------------------------------------- |
 | `app/`                | App Router routes, layout, metadata, sitemap, robots, OG image          |
-| `app/api/time/`       | The one server endpoint — returns NTP-disciplined true UTC for the sync check |
-| `components/`         | UI — the kinetic clock (`kinetic-clock.tsx`), the live tab title, the shadcn button |
+| `app/api/time/`       | The one server endpoint. Returns NTP-disciplined true UTC for the sync check |
+| `components/`         | UI: the kinetic clock (`kinetic-clock.tsx`), the live tab title, the shadcn button |
 | `hooks/`              | Live-time ticking (`use-now.ts`)                                         |
 | `lib/`                | Wall-clock helpers (`time.ts`), client clock sync (`clock-sync.ts`), server NTP discipline (`server-time.ts`), site config (`site.ts`) |
 | `lib/kinetic/`        | The home page's field: the WebGL shader and its handle (`field.ts`), the scroll easing curves (`easing.ts`) |
@@ -83,7 +83,7 @@ The site needs no environment variables to run. One optional variable is support
 
 ## How synchronization works
 
-Two layers keep the time honest. On the server, `lib/server-time.ts` disciplines the `/api/time` endpoint against public NTP servers (Cloudflare, Google, `pool.ntp.org`) over UDP — with an HTTP fallback — so the endpoint returns true UTC even if the host's own clock has drifted.
+Two layers keep the time honest. On the server, `lib/server-time.ts` disciplines the `/api/time` endpoint against public NTP servers (Cloudflare, Google, `pool.ntp.org`) over UDP, with an HTTP fallback, so the endpoint returns true UTC even if the host's own clock has drifted.
 
 On the client, `lib/clock-sync.ts` samples that endpoint several times. It keeps the sample with the lowest round-trip time, compensates the server timestamp for half that round trip, and treats RTT/2 of the best sample as the accuracy bound. The resulting offset corrects the clock. Watchdogs re-measure when the wall-vs-monotonic baseline jumps (a manual clock change or sleep/wake) or when the tab becomes visible again after the result goes stale.
 
@@ -99,6 +99,6 @@ This source is published for transparency and reference only. No license is gran
 
 ## Author
 
-**Dominik Könitzer** — software engineer in Zürich, Switzerland.
+**Dominik Könitzer**, software engineer in Zürich, Switzerland.
 
 [dk.punds.ch](https://dk.punds.ch) · [CV](https://dk.punds.ch/cv) · [@dominikkoenitzer](https://github.com/dominikkoenitzer) · [dominik.koenitzer@gmail.com](mailto:dominik.koenitzer@gmail.com)

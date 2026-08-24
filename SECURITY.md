@@ -2,7 +2,7 @@
 
 ## Reporting a vulnerability
 
-Please report security issues **privately** — do not open a public GitHub issue for anything security-sensitive.
+Please report security issues **privately**. Don't open a public GitHub issue for anything security-sensitive.
 
 - Preferred: open a [private security advisory](https://github.com/dominikkoenitzer/Time/security/advisories/new) on this repository.
 - Alternatively: email **dominik.koenitzer@gmail.com** with the details.
@@ -21,6 +21,6 @@ Please include:
 
 ## Scope
 
-This is a static, client-rendered website. It has a single server endpoint (`/api/time`) that returns the server's current time and nothing else; it stores no accounts and no personal data on a server. The only saved preference — light or dark theme — lives in the visitor's own browser via `localStorage`.
+This is a static, client-rendered website. It has a single server endpoint (`/api/time`) that returns the server's current time and nothing else; it stores no accounts and no personal data on a server. The only saved preference, light or dark theme, lives in the visitor's own browser via `localStorage`.
 
 Reports most relevant to this project include cross-site scripting, content-injection, dependency vulnerabilities, and anything that could mislead a visitor about the displayed time.

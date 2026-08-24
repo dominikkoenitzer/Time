@@ -4,13 +4,13 @@
  *
  * `createField` hands back a small handle instead of loose uniform locations,
  * so the render loop names what it is setting and cannot silently pass the
- * wrong one. It returns null when WebGL is unavailable — the page is still
+ * wrong one. It returns null when WebGL is unavailable, and the page is still
  * perfectly readable without it.
  */
 
-// Single accent — drives the shader field, the live rail dot, the active rail
-// label, and the accretion-ring glow. A muted sage rather than a vivid hue, so
-// the field reads calm instead of electric.
+// One accent colour, driving the shader field, the live rail dot, the active
+// rail label and the accretion-ring glow. A muted sage, not a vivid hue, so the
+// field reads calm instead of electric.
 export const ACCENT = "#a3bd93" // muted sage
 
 function hexToVec(hex: string): [number, number, number] {
@@ -55,7 +55,7 @@ const FRAG = `
     col*=mix(0.22,1.0, smoothstep(0.0,0.55,sc));
 
     // Clean hero: at rest the field is pure background (no texture/effects). Once
-    // you start scrolling it fades in — gray first, then climbing into the
+    // you start scrolling it fades in: gray first, then climbing into the
     // muted sage field deeper down.
     float lum = dot(col, vec3(0.2126, 0.7152, 0.0722));
     float reveal = smoothstep(0.0, 0.7, u_phase);
@@ -95,7 +95,7 @@ export interface FieldUniforms {
   scroll2: number
   /** Sub-second pulse, 1 on the tick and decaying to 0. */
   pulse: number
-  /** Raw scroll position in viewports — drives which act is on screen. */
+  /** Raw scroll position in viewports. Drives which act is on screen. */
   phase: number
   /** Singularity collapse, 0..1. */
   collapse: number

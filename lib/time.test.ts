@@ -30,14 +30,14 @@ describe("sampleOffsetMs — the NTP measurement", () => {
   })
 
   it("attributes exactly half the round trip to the outbound leg", () => {
-    // Same true offset, different latency — the correction must absorb it.
+    // Same true offset, different latency. The correction must absorb it.
     expect(sampleOffsetMs(1000, 1000, 0)).toBe(0)
     expect(sampleOffsetMs(1050, 1000, 100)).toBe(0)
     expect(sampleOffsetMs(1500, 1000, 1000)).toBe(0)
   })
 
   it("bounds the error by half the round trip", () => {
-    // Whatever the true offset, a sample can only be wrong by rtt/2 — that is
+    // Whatever the true offset, a sample can only be wrong by rtt/2, which is
     // the whole reason the fastest sample is preferred.
     const rtt = 80
     const truth = 4321
@@ -83,7 +83,7 @@ describe("pad", () => {
 describe("getIsoWeek", () => {
   /*
    * ISO-8601 weeks start on Monday and week 1 is the week containing the first
-   * Thursday of the year — which is why the turn of the year is the only place
+   * Thursday of the year, which is why the turn of the year is the only place
    * this can go wrong. These are the standard boundary cases.
    */
   it("puts the first Thursday's week at 1", () => {
@@ -92,13 +92,13 @@ describe("getIsoWeek", () => {
   })
 
   it("keeps early-January days in the previous year's last week", () => {
-    expect(getIsoWeek(wall(2021, 1, 1))).toBe(53) // Fri — belongs to 2020-W53
-    expect(getIsoWeek(wall(2021, 1, 3))).toBe(53) // Sun — still 2020-W53
+    expect(getIsoWeek(wall(2021, 1, 1))).toBe(53) // Fri, belongs to 2020-W53
+    expect(getIsoWeek(wall(2021, 1, 3))).toBe(53) // Sun, still 2020-W53
   })
 
   it("pulls late-December days into the next year's week 1", () => {
-    expect(getIsoWeek(wall(2019, 12, 30))).toBe(1) // Mon — 2020-W01
-    expect(getIsoWeek(wall(2024, 12, 30))).toBe(1) // Mon — 2025-W01
+    expect(getIsoWeek(wall(2019, 12, 30))).toBe(1) // Mon, 2020-W01
+    expect(getIsoWeek(wall(2024, 12, 30))).toBe(1) // Mon, 2025-W01
   })
 
   it("recognises a 53-week year", () => {
@@ -184,7 +184,7 @@ describe("daysInYear", () => {
   })
 
   it("applies the century rule", () => {
-    // Divisible by 4 but not a leap year — the case a naive `% 4` gets wrong.
+    // Divisible by 4 but not a leap year: the case a naive `% 4` gets wrong.
     expect(daysInYear(1900)).toBe(365)
     expect(daysInYear(2100)).toBe(365)
     // Divisible by 400, so it is one after all.
