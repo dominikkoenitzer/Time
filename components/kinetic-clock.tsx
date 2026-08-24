@@ -58,7 +58,7 @@ export function KineticClock() {
     ensureClockSync()
 
     // Smooth scroll. Lenis drives the real document scroll, so window.scrollY
-    // and native scroll events — which the whole timeline below reads — keep
+    // and native scroll events, which the whole timeline below reads, keep
     // working untouched; it just glides between positions. Disabled when the
     // visitor prefers reduced motion.
     const reduceMotion = window.matchMedia(
@@ -96,7 +96,7 @@ export function KineticClock() {
     let rebornStart = 0
 
     const updateOverlay = () => {
-      if (diving) return // gravity has taken over — ignore scroll
+      if (diving) return // gravity has taken over, so ignore scroll
 
       const vh = window.innerHeight || 1
       const sc = window.scrollY || window.pageYOffset || 0
@@ -170,7 +170,7 @@ export function KineticClock() {
       if (escapeRef.current)
         escapeRef.current.style.opacity = String(sstep(0.84, 1, collapse))
 
-      // past the point of no return — gravity takes over, no more scrolling needed
+      // past the point of no return: gravity takes over, no more scrolling needed
       if (collapse >= 0.5) {
         diving = true
         diveStart = performance.now()

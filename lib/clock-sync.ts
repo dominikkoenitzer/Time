@@ -27,7 +27,7 @@ export function sampleOffsetMs(
 
 /**
  * The sample with the smallest round trip. Its offset cannot be wrong by more
- * than rtt/2, so the fastest sample is the most trustworthy one — averaging
+ * than rtt/2, so the fastest sample is the most trustworthy one. Averaging
  * would let a single slow response drag the result.
  */
 export function pickBestSample(samples: readonly SyncSample[]): SyncSample {
@@ -59,7 +59,7 @@ export function correctedNowMs(): number {
  *
  * The server's stamp is assumed to sit halfway through the round trip, so
  * offset = serverNow − (start + rtt/2). The round trip itself is measured
- * with performance.now(), which is monotonic — a device-clock step during
+ * with performance.now(), which is monotonic, so a device-clock step during
  * the measurement cannot corrupt it. The sample with the smallest round trip
  * wins; its offset cannot be wrong by more than rtt/2.
  */
@@ -93,7 +93,7 @@ async function measure() {
 
 function startWatchdogs() {
   // A jump between the wall clock and the monotonic clock means the device
-  // clock was adjusted (or the machine slept) — either way, re-measure.
+  // clock was adjusted, or the machine slept. Either way, re-measure.
   let baseline = Date.now() - performance.now()
 
   window.setInterval(() => {

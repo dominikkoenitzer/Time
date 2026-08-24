@@ -59,7 +59,8 @@ export function getDayOfYear(wall: WallClock): number {
 /**
  * 365, or 366 in a leap year. The "year progress" readout divides by this, so
  * getting the century rule wrong would quietly skew the percentage on 1900-style
- * years — hence a named function with tests rather than an inline expression.
+ * years, which is why this is a named function with tests and not an inline
+ * expression.
  */
 export function daysInYear(year: number): number {
   const leap = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0

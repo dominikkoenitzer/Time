@@ -4,7 +4,7 @@ import dgram from "node:dgram"
  * Authoritative server time, disciplined against NTP.
  *
  * The host's own wall clock (`Date.now()`) cannot be trusted for a
- * clock-accuracy site — a serverless host or a dev machine can sit a second
+ * clock-accuracy site: a serverless host or a dev machine can sit a second
  * or more off true time, which would make the site "correct" every visitor
  * toward the wrong moment. Instead we measure the offset between this host's
  * clock and a stratum-1-backed NTP server, cache it, and report
@@ -30,7 +30,7 @@ const REFRESH_AFTER_MS = 5 * 60_000
 const NTP_UNIX_EPOCH_DIFF = 2_208_988_800
 
 export interface ServerTime {
-  /** True UTC in milliseconds — host clock corrected by the measured offset. */
+  /** True UTC in milliseconds: the host clock corrected by the measured offset. */
   now: number
   /** How far the host clock is from true time (negative = host is ahead). */
   offsetMs: number
@@ -138,7 +138,7 @@ async function measureOffset(): Promise<Offset | null> {
   try {
     return await Promise.any(NTP_SERVERS.map(queryNtp))
   } catch {
-    // every NTP server failed (UDP likely blocked) — fall through to HTTP
+    // every NTP server failed, UDP is likely blocked, so fall through to HTTP
   }
 
   try {

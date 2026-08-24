@@ -1,7 +1,7 @@
 /**
- * The two curves the scroll timeline is built from. Pure, so the shapes they
- * promise — clamped at both ends, monotonic in between, symmetric about the
- * midpoint — are pinned by tests rather than by eye.
+ * The two curves the scroll timeline is built from. They are pure, so the
+ * shapes they promise (clamped at both ends, monotonic in between, symmetric
+ * about the midpoint) are pinned by tests instead of by eye.
  */
 
 /** Ease in and out, quadratic. Maps [0,1] onto [0,1]. */

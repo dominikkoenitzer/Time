@@ -15,7 +15,7 @@ bun run dev        # http://localhost:1000
 
 ## Before you open a pull request
 
-Run the same gate that CI runs — all four must pass:
+Run the same gate CI runs. All four have to pass:
 
 ```bash
 bun run typecheck
@@ -42,4 +42,4 @@ Formatting is enforced by Prettier (no semicolons, double quotes, 2-space indent
 
 ## Reporting bugs and requesting features
 
-Use the issue forms under **New issue**. For anything security-sensitive, do **not** open a public issue — follow [SECURITY.md](SECURITY.md) instead.
+Use the issue forms under **New issue**. For anything security-sensitive, do **not** open a public issue. Follow [SECURITY.md](SECURITY.md) instead.
