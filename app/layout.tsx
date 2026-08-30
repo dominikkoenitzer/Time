@@ -7,7 +7,7 @@ import {
 } from "next/font/google"
 
 import "./globals.css"
-import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site"
+import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "@/lib/site"
 import { cn } from "@/lib/utils"
 
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" })
@@ -30,27 +30,31 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-kinetic-mono",
 })
 
-const TITLE = `${SITE_NAME} — the exact time, anywhere`
-
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: TITLE,
+  title: SITE_TITLE,
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
   alternates: {
     canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    "max-snippet": -1,
+    "max-image-preview": "large",
   },
   openGraph: {
     siteName: SITE_NAME,
     type: "website",
     locale: "en_US",
     url: "/",
-    title: TITLE,
+    title: SITE_TITLE,
     description: SITE_DESCRIPTION,
   },
   twitter: {
     card: "summary_large_image",
-    title: TITLE,
+    title: SITE_TITLE,
     description: SITE_DESCRIPTION,
   },
 }
