@@ -15,7 +15,7 @@ export function LiveTitle({ label }: { label: string }) {
     const wall = getWallClock(now)
     const time = `${pad(wall.hour)}:${pad(wall.minute)}:${pad(wall.second)}`
 
-    document.title = `${time} — ${label}`
+    document.title = `${time} · ${label}`
   }, [now, label])
 
   return null

@@ -1,6 +1,8 @@
 import { ImageResponse } from "next/og"
 
-export const alt = "Time — the exact time, anywhere"
+import { SITE_TITLE } from "@/lib/site"
+
+export const alt = SITE_TITLE
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 
@@ -31,7 +33,7 @@ export default function OpenGraphImage() {
           fontFamily: "sans-serif",
         }}
       >
-        Time — the exact time, anywhere
+        {SITE_TITLE}
       </div>
     </div>,
     size
