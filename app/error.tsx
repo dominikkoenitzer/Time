@@ -12,7 +12,7 @@ export default function ErrorPage({ reset }: { reset: () => void }) {
         Something went wrong
       </h1>
       <p className="max-w-sm text-sm text-muted-foreground">
-        The clock hit a snag. Try again — your device&apos;s time is unaffected.
+        The clock hit a snag. Try again. Nothing on your device was touched.
       </p>
       <Button onClick={reset} className="mt-2">
         Try again
