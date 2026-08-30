@@ -325,7 +325,7 @@ export function KineticClock() {
           inline in the SSR HTML so it applies at first paint — no white
           scrollbar/flash. */}
       <style>{`html,body{background:#08080a!important;overflow-x:hidden}html{color-scheme:dark!important}@media(max-width:640px){.kc-rail{display:none!important}}`}</style>
-      <h1 className="sr-only">Time — the exact current time, anywhere</h1>
+      <h1 className="sr-only">Time: the exact current time, anywhere</h1>
       <canvas
         ref={canvasRef}
         aria-hidden
@@ -492,8 +492,8 @@ export function KineticClock() {
             9,192,631,770
           </div>
           <div style={stationSub}>
-            oscillations of a caesium-133 atom define exactly one second. The
-            clock above is counting them — faithfully, forever.
+            oscillations of a caesium-133 atom define exactly one second. That
+            is the unit the clock above is counting, one at a time.
           </div>
         </div>
 
@@ -511,7 +511,7 @@ export function KineticClock() {
             <span className="tabular-nums" ref={untilRef}>
               00h 00m
             </span>{" "}
-            until midnight — then the count begins again.
+            until midnight, when the count starts over.
           </div>
         </div>
 
@@ -563,8 +563,7 @@ export function KineticClock() {
             0
           </div>
           <div style={stationSub}>
-            seconds since 1 January 1970 — a number that has only ever grown,
-            and never once paused.
+            seconds since 1 January 1970. The number has only ever gone up.
           </div>
         </div>
 
@@ -579,8 +578,8 @@ export function KineticClock() {
             .
           </div>
           <div style={stationSub}>
-            …and that, too, is already in the past. Time well spent — now back
-            to it.
+            …and that, too, is already in the past. The rest of the day is
+            still yours.
           </div>
         </div>
 
@@ -628,7 +627,7 @@ export function KineticClock() {
             color: "#cfcfc7",
           }}
         >
-          Every second you spent is inside it now — ↑ climb back out
+          Every second you spent is inside it now. ↑ Climb back out
         </div>
       </div>
 

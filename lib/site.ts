@@ -8,4 +8,4 @@ export const SITE_NAME = "Time"
 export const SITE_TITLE = `${SITE_NAME}: the exact current time, anywhere`
 
 export const SITE_DESCRIPTION =
-  "The exact current time, corrected against the server and accurate to within hundredths of a second."
+  "The exact current time, from a clock that corrects itself against our server and stays right to within hundredths of a second."

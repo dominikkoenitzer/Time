@@ -12,7 +12,7 @@ export default function NotFound() {
         We couldn&apos;t find that page
       </h1>
       <p className="max-w-sm text-sm text-muted-foreground">
-        That page doesn&apos;t exist. Head back to the clock.
+        There is nothing at this address.
       </p>
       <Button asChild className="mt-2">
         <Link href="/">Back to the clock</Link>
