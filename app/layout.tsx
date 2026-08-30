@@ -63,6 +63,23 @@ export const viewport: Viewport = {
   themeColor: "#0a0a0a",
 }
 
+// Structured data: only facts that are true of the page itself.
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: SITE_NAME,
+  url: SITE_URL,
+  description: SITE_DESCRIPTION,
+  applicationCategory: "UtilitiesApplication",
+  operatingSystem: "Any",
+  browserRequirements: "Requires JavaScript",
+  author: {
+    "@type": "Person",
+    name: "dominikkoenitzer",
+    url: "https://dk.punds.ch",
+  },
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -83,6 +100,10 @@ export default function RootLayout({
       )}
     >
       <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
         {/* Everything on the page is the clock, so it all belongs to one main
             landmark — without it none of the content sits in a region a screen
             reader can jump to. */}
