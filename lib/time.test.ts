@@ -14,7 +14,7 @@ const wall = (year: number, month: number, day: number) => ({
   weekday: "",
 })
 
-describe("sampleOffsetMs — the NTP measurement", () => {
+describe("sampleOffsetMs: the NTP measurement", () => {
   it("reports no offset when the device clock already agrees", () => {
     // Request left at t=1000, took 200ms, so the server stamp should read 1100.
     expect(sampleOffsetMs(1100, 1000, 200)).toBe(0)
