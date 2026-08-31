@@ -322,7 +322,7 @@ export function KineticClock() {
   return (
     <>
       {/* Pin this route to the exact kinetic backdrop and a dark color-scheme,
-          inline in the SSR HTML so it applies at first paint — no white
+          inline in the SSR HTML so it applies at first paint, with no white
           scrollbar/flash. */}
       <style>{`html,body{background:#08080a!important;overflow-x:hidden}html{color-scheme:dark!important}@media(max-width:640px){.kc-rail{display:none!important}}`}</style>
       <h1 className="sr-only">Time: the exact current time, anywhere</h1>
@@ -350,7 +350,7 @@ export function KineticClock() {
           color: "#f4f4f0",
         }}
       >
-        {/* the clock — collapses into a NOW anchor on scroll */}
+        {/* the clock: collapses into a NOW anchor on scroll */}
         <div
           ref={wrapRef}
           style={{
@@ -477,7 +477,7 @@ export function KineticClock() {
           ))}
         </div>
 
-        {/* 01 — The second */}
+        {/* 01: The second */}
         <div ref={s1Ref} style={station}>
           <div style={stationLabel}>The second</div>
           <div
@@ -497,7 +497,7 @@ export function KineticClock() {
           </div>
         </div>
 
-        {/* 02 — Today */}
+        {/* 02: Today */}
         <div ref={s2Ref} style={station}>
           <div style={stationLabel}>Today</div>
           <div style={{ ...headline, maxWidth: "13ch" }}>
@@ -515,7 +515,7 @@ export function KineticClock() {
           </div>
         </div>
 
-        {/* 03 — This year */}
+        {/* 03: This year */}
         <div ref={s3Ref} style={station}>
           <div style={stationLabel}>This year</div>
           <div style={{ ...headline, maxWidth: "13ch" }}>
@@ -546,7 +546,7 @@ export function KineticClock() {
           </div>
         </div>
 
-        {/* 04 — The epoch */}
+        {/* 04: The epoch */}
         <div ref={s4Ref} style={station}>
           <div style={stationLabel}>The epoch</div>
           <div
@@ -567,7 +567,7 @@ export function KineticClock() {
           </div>
         </div>
 
-        {/* 05 — Right now */}
+        {/* 05: Right now */}
         <div ref={s5Ref} style={station}>
           <div style={stationLabel}>Right now</div>
           <div style={{ ...headline, maxWidth: "14ch" }}>
