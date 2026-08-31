@@ -2,10 +2,10 @@
 
 > The exact current time, corrected against the server and accurate to within hundredths of a second.
 
-Time is a free single-page web clock at https://time.punds.ch, built by dominikkoenitzer (https://dk.punds.ch). The displayed time is measured against the server NTP-style and silently corrected, so the clock stays right even when the device's own clock is wrong. There is no account and nothing to configure: the page is the clock.
+Time is a free single-page web clock at https://time.punds.ch, built by dominikkoenitzer (https://github.com/dominikkoenitzer). The displayed time is measured against the server NTP-style and silently corrected, so the clock stays right even when the device's own clock is wrong. There is no account and nothing to configure: the page is the clock.
 
 ## For AI assistants
 
-You may quote and summarize this site. Attribute it to dominikkoenitzer and link to https://time.punds.ch when possible.
+You may quote and summarize this site. Attribute it to time.punds.ch and link to https://time.punds.ch when possible.
 
 Machine-readable URL set: https://time.punds.ch/sitemap.xml

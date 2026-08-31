@@ -76,7 +76,7 @@ const structuredData = {
   author: {
     "@type": "Person",
     name: "dominikkoenitzer",
-    url: "https://dk.punds.ch",
+    url: "https://github.com/dominikkoenitzer",
   },
 }
 
