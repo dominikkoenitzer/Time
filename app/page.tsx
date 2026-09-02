@@ -1,28 +1,15 @@
-import { KineticClock } from "@/components/kinetic-clock"
+import { Clock } from "@/components/clock"
 import { LiveTitle } from "@/components/live-title"
-import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site"
-
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  name: SITE_NAME,
-  url: SITE_URL,
-  description: SITE_DESCRIPTION,
-  applicationCategory: "UtilitiesApplication",
-  operatingSystem: "Any",
-  browserRequirements: "Requires a modern web browser with JavaScript",
-  isAccessibleForFree: true,
-}
+import { SITE_NAME, SITE_TITLE } from "@/lib/site"
 
 export default function Page() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      {/* The clock is the whole page, so the heading exists for screen readers
+          and search results rather than for the layout. */}
+      <h1 className="sr-only">{SITE_TITLE}</h1>
       <LiveTitle label={SITE_NAME} />
-      <KineticClock />
+      <Clock />
     </>
   )
 }

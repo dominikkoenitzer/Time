@@ -1,18 +1,14 @@
 import { describe, expect, it } from "vitest"
 
 import { pickBestSample, sampleOffsetMs, type SyncSample } from "./clock-sync"
-import { easeIO, sstep } from "./kinetic/easing"
-import { daysInYear, getDayOfYear, getIsoWeek, getWallClock, pad } from "./time"
-
-const wall = (year: number, month: number, day: number) => ({
-  year,
-  month,
-  day,
-  hour: 12,
-  minute: 0,
-  second: 0,
-  weekday: "",
-})
+import {
+  formatLongDate,
+  formatUtcOffset,
+  getIsoWeek,
+  getTimeZoneName,
+  getWallClock,
+  pad,
+} from "./time"
 
 describe("sampleOffsetMs: the NTP measurement", () => {
   it("reports no offset when the device clock already agrees", () => {
@@ -80,66 +76,6 @@ describe("pad", () => {
   })
 })
 
-describe("getIsoWeek", () => {
-  /*
-   * ISO-8601 weeks start on Monday and week 1 is the week containing the first
-   * Thursday of the year, which is why the turn of the year is the only place
-   * this can go wrong. These are the standard boundary cases.
-   */
-  it("puts the first Thursday's week at 1", () => {
-    expect(getIsoWeek(wall(2026, 1, 1))).toBe(1) // Thursday
-    expect(getIsoWeek(wall(2021, 1, 4))).toBe(1) // Monday
-  })
-
-  it("keeps early-January days in the previous year's last week", () => {
-    expect(getIsoWeek(wall(2021, 1, 1))).toBe(53) // Fri, belongs to 2020-W53
-    expect(getIsoWeek(wall(2021, 1, 3))).toBe(53) // Sun, still 2020-W53
-  })
-
-  it("pulls late-December days into the next year's week 1", () => {
-    expect(getIsoWeek(wall(2019, 12, 30))).toBe(1) // Mon, 2020-W01
-    expect(getIsoWeek(wall(2024, 12, 30))).toBe(1) // Mon, 2025-W01
-  })
-
-  it("recognises a 53-week year", () => {
-    expect(getIsoWeek(wall(2020, 12, 31))).toBe(53)
-  })
-
-  it("stays within 1..53 for every day of several years", () => {
-    for (const year of [2019, 2020, 2021, 2024, 2026]) {
-      for (let m = 1; m <= 12; m++) {
-        for (let d = 1; d <= 28; d++) {
-          const w = getIsoWeek(wall(year, m, d))
-          expect(w).toBeGreaterThanOrEqual(1)
-          expect(w).toBeLessThanOrEqual(53)
-        }
-      }
-    }
-  })
-})
-
-describe("getDayOfYear", () => {
-  it("counts from 1 on January 1st", () => {
-    expect(getDayOfYear(wall(2026, 1, 1))).toBe(1)
-  })
-
-  it("handles the end of a common year", () => {
-    expect(getDayOfYear(wall(2026, 12, 31))).toBe(365)
-  })
-
-  it("handles the end of a leap year", () => {
-    expect(getDayOfYear(wall(2024, 12, 31))).toBe(366)
-    expect(getDayOfYear(wall(2024, 3, 1))).toBe(61) // Feb 29 exists
-    expect(getDayOfYear(wall(2026, 3, 1))).toBe(60) // it does not
-  })
-
-  it("increases by exactly one per day across a month boundary", () => {
-    expect(
-      getDayOfYear(wall(2026, 2, 1)) - getDayOfYear(wall(2026, 1, 31))
-    ).toBe(1)
-  })
-})
-
 describe("getWallClock", () => {
   const instant = new Date("2026-08-17T21:34:56.000Z")
 
@@ -172,94 +108,117 @@ describe("getWallClock", () => {
   })
 })
 
-describe("daysInYear", () => {
-  it("is 365 in a common year", () => {
-    expect(daysInYear(2026)).toBe(365)
-    expect(daysInYear(2025)).toBe(365)
+describe("formatLongDate", () => {
+  const instant = new Date("2026-09-02T12:00:00.000Z")
+
+  it("puts the day before the month and drops the American comma", () => {
+    // en-US would render this "Wednesday, September 2, 2026". The parts are
+    // reassembled precisely so the caption does not move with the locale.
+    expect(formatLongDate(instant, "UTC")).toBe("Wednesday, 2 September 2026")
   })
 
-  it("is 366 in a leap year", () => {
-    expect(daysInYear(2024)).toBe(366)
-    expect(daysInYear(2020)).toBe(366)
+  it("names the day the visitor is actually having", () => {
+    // Noon UTC is already the 3rd in Auckland, a Thursday.
+    expect(formatLongDate(instant, "Pacific/Auckland")).toBe(
+      "Thursday, 3 September 2026"
+    )
   })
 
-  it("applies the century rule", () => {
-    // Divisible by 4 but not a leap year: the case a naive `% 4` gets wrong.
-    expect(daysInYear(1900)).toBe(365)
-    expect(daysInYear(2100)).toBe(365)
-    // Divisible by 400, so it is one after all.
-    expect(daysInYear(2000)).toBe(366)
-    expect(daysInYear(2400)).toBe(366)
-  })
-
-  it("agrees with the day-of-year count for December 31st", () => {
-    for (const year of [1900, 2000, 2020, 2024, 2025, 2026, 2100]) {
-      expect(getDayOfYear({ ...wall(year, 12, 31) })).toBe(daysInYear(year))
-    }
+  it("pads nothing: the 2nd is 2, not 02", () => {
+    expect(formatLongDate(instant, "UTC")).toContain(" 2 ")
   })
 })
 
-describe("easeIO", () => {
-  it("is pinned at both ends and passes through the midpoint", () => {
-    expect(easeIO(0)).toBe(0)
-    expect(easeIO(1)).toBe(1)
-    expect(easeIO(0.5)).toBeCloseTo(0.5, 10)
+describe("getTimeZoneName", () => {
+  it("names the zone in full", () => {
+    expect(getTimeZoneName(new Date("2026-09-02T12:00:00Z"), "UTC")).toBe(
+      "Coordinated Universal Time"
+    )
   })
 
-  it("rises monotonically", () => {
-    let prev = -Infinity
-    for (let i = 0; i <= 100; i++) {
-      const v = easeIO(i / 100)
-      expect(v).toBeGreaterThanOrEqual(prev)
-      prev = v
-    }
-  })
-
-  it("is symmetric about the midpoint", () => {
-    for (const x of [0.1, 0.25, 0.4]) {
-      expect(easeIO(x) + easeIO(1 - x)).toBeCloseTo(1, 10)
-    }
+  it("follows a zone in and out of summer time", () => {
+    const zurich = "Europe/Zurich"
+    expect(getTimeZoneName(new Date("2026-09-02T12:00:00Z"), zurich)).toBe(
+      "Central European Summer Time"
+    )
+    expect(getTimeZoneName(new Date("2026-01-02T12:00:00Z"), zurich)).toBe(
+      "Central European Standard Time"
+    )
   })
 })
 
-describe("sstep", () => {
-  it("clamps outside the thresholds rather than running away", () => {
-    expect(sstep(0.2, 0.8, 0)).toBe(0)
-    expect(sstep(0.2, 0.8, -5)).toBe(0)
-    expect(sstep(0.2, 0.8, 1)).toBe(1)
-    expect(sstep(0.2, 0.8, 99)).toBe(1)
+describe("formatUtcOffset", () => {
+  it("labels Greenwich itself", () => {
+    expect(formatUtcOffset(0)).toBe("UTC+00:00")
   })
 
-  it("hits the thresholds exactly", () => {
-    expect(sstep(0.2, 0.8, 0.2)).toBe(0)
-    expect(sstep(0.2, 0.8, 0.8)).toBe(1)
+  it("signs east as plus and west as minus", () => {
+    // The caller negates Date#getTimezoneOffset, which counts the other way,
+    // so New York (+300 from that method) arrives here as -300.
+    expect(formatUtcOffset(120)).toBe("UTC+02:00")
+    expect(formatUtcOffset(-300)).toBe("UTC-05:00")
   })
 
-  it("is half way at the midpoint of the band", () => {
-    expect(sstep(0.2, 0.8, 0.5)).toBeCloseTo(0.5, 10)
-    expect(sstep(6.1, 7.3, 6.7)).toBeCloseTo(0.5, 10)
+  it("keeps the zones that are not a whole hour off", () => {
+    expect(formatUtcOffset(330)).toBe("UTC+05:30") // India
+    expect(formatUtcOffset(345)).toBe("UTC+05:45") // Nepal
+    expect(formatUtcOffset(-570)).toBe("UTC-09:30") // Marquesas
   })
 
-  it("rises monotonically across the band", () => {
-    let prev = -Infinity
-    for (let i = 0; i <= 100; i++) {
-      const v = sstep(0.2, 0.8, i / 100)
-      expect(v).toBeGreaterThanOrEqual(prev)
-      prev = v
-    }
+  it("pads to two digits on both sides", () => {
+    expect(formatUtcOffset(60)).toBe("UTC+01:00")
+    expect(formatUtcOffset(-60)).toBe("UTC-01:00")
   })
 
-  it("never leaves 0..1, whatever the band", () => {
-    for (const [a, b] of [
-      [0, 1],
-      [0.55, 1.15],
-      [6.1, 7.3],
-      [-2, 3],
-    ]) {
-      for (let i = -20; i <= 120; i++) {
-        const v = sstep(a, b, i / 10)
-        expect(v).toBeGreaterThanOrEqual(0)
-        expect(v).toBeLessThanOrEqual(1)
+  it("handles the far ends of the range", () => {
+    expect(formatUtcOffset(840)).toBe("UTC+14:00") // Kiritimati
+    expect(formatUtcOffset(-720)).toBe("UTC-12:00")
+  })
+})
+
+describe("getIsoWeek", () => {
+  const wall = (year: number, month: number, day: number) => ({
+    year,
+    month,
+    day,
+    hour: 12,
+    minute: 0,
+    second: 0,
+    weekday: "",
+  })
+
+  /*
+   * Weeks start on Monday and week 1 is the week holding the first Thursday of
+   * the year, so the turn of the year is the only place this can go wrong.
+   * These are the standard boundary cases.
+   */
+  it("puts the first Thursday's week at 1", () => {
+    expect(getIsoWeek(wall(2026, 1, 1))).toBe(1) // Thursday
+    expect(getIsoWeek(wall(2021, 1, 4))).toBe(1) // Monday
+  })
+
+  it("keeps early-January days in the previous year's last week", () => {
+    expect(getIsoWeek(wall(2021, 1, 1))).toBe(53) // Fri, belongs to 2020-W53
+    expect(getIsoWeek(wall(2021, 1, 3))).toBe(53) // Sun, still 2020-W53
+  })
+
+  it("pulls late-December days into the next year's week 1", () => {
+    expect(getIsoWeek(wall(2019, 12, 30))).toBe(1) // Mon, 2020-W01
+    expect(getIsoWeek(wall(2024, 12, 30))).toBe(1) // Mon, 2025-W01
+  })
+
+  it("recognises a 53-week year", () => {
+    expect(getIsoWeek(wall(2020, 12, 31))).toBe(53)
+  })
+
+  it("stays within 1..53 for every day of several years", () => {
+    for (const year of [2019, 2020, 2021, 2024, 2026]) {
+      for (let m = 1; m <= 12; m++) {
+        for (let d = 1; d <= 28; d++) {
+          const week = getIsoWeek(wall(year, m, d))
+          expect(week).toBeGreaterThanOrEqual(1)
+          expect(week).toBeLessThanOrEqual(53)
+        }
       }
     }
   })
