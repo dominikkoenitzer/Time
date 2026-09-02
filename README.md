@@ -2,10 +2,10 @@
 
 **The exact time, anywhere. Synchronized with the server and accurate to within hundredths of a second.**
 
-Time shows the precise, server-corrected current time, synchronized the same way NTP works, so it stays right even when the device you're viewing it on is set wrong. The home page is one immersive scene: scroll to fall through the second, the day, the year, and the Unix epoch.
+Time shows the precise, server-corrected current time, synchronized the same way NTP works, so it stays right even when the device you're viewing it on is set wrong. The whole site is one screen, greyscale and centred. Nothing to scroll, nothing to click, nothing to dismiss.
 
 [![CI](https://github.com/dominikkoenitzer/Time/actions/workflows/ci.yml/badge.svg)](https://github.com/dominikkoenitzer/Time/actions/workflows/ci.yml)
-[![tests](https://img.shields.io/badge/tests-34%20passing-3178c6)](lib/time.test.ts)
+[![tests](https://img.shields.io/badge/tests-28%20passing-3178c6)](lib/time.test.ts)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=nextdotjs)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss&logoColor=white)
@@ -20,7 +20,9 @@ Time shows the precise, server-corrected current time, synchronized the same way
 
 - **Synchronized, accurate time (the point of the site).** An NTP-style measurement samples the server several times and keeps the lowest round-trip sample, so the displayed time is corrected to within hundredths of a second of the true time, automatically and with nothing to click.
 - **Server-corrected time everywhere.** The displayed clock is drawn from the measured server offset, so it stays right even if the device it runs on is set wrong.
-- **A kinetic home page.** Scroll to fall through the clock, from this second out to the day, the year and the Unix epoch, rendered with a live WebGL field.
+- **One screen, and nothing else.** One centred block in a single monospaced face: the clock, with the long date, ISO week, zone name and UTC offset registered to the clock's own edges rather than the screen's. No panels, no banners, no settings, and the page cannot scroll.
+- **One gesture, and one colour.** The face assembles once and is then still. The colons dwell dark for the last 100ms of every second and return exactly on the tick, the way a station clock waits for the impulse from its master, and they are the only thing on the site that carries colour.
+- **Named timezone, not just an offset.** The clock says "Central European Summer Time (UTC+02:00)", read from the browser's own `Intl` data, so it follows the visitor in and out of summer time on its own.
 - **No external time APIs and no timezone data files.** The current time is computed client-side with the built-in `Intl` APIs. The server's only job is the `/api/time` endpoint, which returns NTP-disciplined true UTC for the sync check.
 
 ## Tech stack
@@ -29,7 +31,6 @@ Time shows the precise, server-corrected current time, synchronized the same way
 - [TypeScript](https://www.typescriptlang.org)
 - [Tailwind CSS v4](https://tailwindcss.com) (CSS-based config, no `tailwind.config`)
 - [shadcn/ui](https://ui.shadcn.com) (`radix-maia` style) for the button primitive
-- Raw [WebGL](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API) for the kinetic home page (no library)
 - [bun](https://bun.sh) as the package manager and runtime
 
 ## Getting started
@@ -47,7 +48,7 @@ bun run dev        # dev server at http://localhost:1000
 | ---------------------- | ------------------------------------- |
 | `bun run dev`          | Start the dev server (port 1000)      |
 | `bun run build`        | Production build                      |
-| `bun run start`        | Serve the production build            |
+| `bun run start`        | Serve the production build (port 1000) |
 | `bun run typecheck`    | `tsc --noEmit`                        |
 | `bun run lint`         | ESLint                                |
 | `bun run format`       | Format `**/*.{ts,tsx}` with Prettier  |
@@ -56,10 +57,10 @@ bun run dev        # dev server at http://localhost:1000
 
 > The tests cover the parts that are easy to get quietly wrong: the NTP offset
 > maths (including that a sample's error is bounded by half the round trip, and
-> that the lowest-latency sample wins rather than an average), ISO-8601 week
-> numbers across year boundaries, leap-year day-of-year and year length
-> (including the century rule), timezone conversion, and the scroll easing
-> curves that drive the home page.
+> that the lowest-latency sample wins rather than an average), timezone
+> conversion, summer-time zone naming, and UTC offsets, whose sign convention
+> is the opposite of `Date#getTimezoneOffset` and which are not always a whole
+> number of hours.
 
 ### Configuration
 
@@ -75,10 +76,9 @@ The site needs no environment variables to run. One optional variable is support
 | --------------------- | ----------------------------------------------------------------------- |
 | `app/`                | App Router routes, layout, metadata, sitemap, robots, OG image          |
 | `app/api/time/`       | The one server endpoint. Returns NTP-disciplined true UTC for the sync check |
-| `components/`         | UI: the kinetic clock (`kinetic-clock.tsx`), the live tab title, the shadcn button |
+| `components/`         | UI: the clock (`clock.tsx`), the live tab title, the shadcn button      |
 | `hooks/`              | Live-time ticking (`use-now.ts`)                                         |
-| `lib/`                | Wall-clock helpers (`time.ts`), client clock sync (`clock-sync.ts`), server NTP discipline (`server-time.ts`), site config (`site.ts`) |
-| `lib/kinetic/`        | The home page's field: the WebGL shader and its handle (`field.ts`), the scroll easing curves (`easing.ts`) |
+| `lib/`                | Wall-clock and formatting helpers (`time.ts`), client clock sync (`clock-sync.ts`), server NTP discipline (`server-time.ts`), site config (`site.ts`) |
 | `public/`             | Static assets                                                           |
 
 ## How synchronization works

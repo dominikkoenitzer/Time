@@ -1,34 +1,15 @@
 import type { Metadata, Viewport } from "next"
-import {
-  Geist_Mono,
-  Figtree,
-  Space_Grotesk,
-  JetBrains_Mono,
-} from "next/font/google"
+import { Figtree, Geist_Mono } from "next/font/google"
 
 import "./globals.css"
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "@/lib/site"
 import { cn } from "@/lib/utils"
 
-const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" })
+// Two faces, each with a job: the mono sets every number and caption on the
+// clock, the sans carries the prose on the error and not-found pages.
+const fontSans = Figtree({ subsets: ["latin"], variable: "--font-sans" })
 
-const fontMono = Geist_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-})
-
-// Display + mono pairing for the kinetic home experience.
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-display",
-})
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-kinetic-mono",
-})
+const fontMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" })
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -73,6 +54,7 @@ const structuredData = {
   applicationCategory: "UtilitiesApplication",
   operatingSystem: "Any",
   browserRequirements: "Requires JavaScript",
+  isAccessibleForFree: true,
   author: {
     "@type": "Person",
     name: "dominikkoenitzer",
@@ -88,15 +70,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      suppressHydrationWarning
       className={cn(
         "dark",
         "antialiased",
         "font-sans",
-        figtree.variable,
-        fontMono.variable,
-        spaceGrotesk.variable,
-        jetbrainsMono.variable
+        fontSans.variable,
+        fontMono.variable
       )}
     >
       <body>
@@ -104,10 +83,17 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
-        {/* Everything on the page is the clock, so it all belongs to one main
-            landmark; without it none of the content sits in a region a screen
-            reader can jump to. */}
-        <main>{children}</main>
+        {/* One screen, and the only landmark: everything the site has to say
+            is the clock, so this is the region a screen reader jumps to.
+            `my-auto` rather than `justify-center` does the centring on purpose
+            -- an auto margin collapses to zero when the viewport is too short,
+            where centring would instead push the top of the content past the
+            top edge, somewhere no scroll or zoom can reach it. Horizontal
+            alignment is left to each route, which is why this centres nothing
+            itself. */}
+        <main className="flex min-h-svh flex-col justify-start px-8 py-8 md:px-16">
+          <div className="my-auto w-full">{children}</div>
+        </main>
       </body>
     </html>
   )
