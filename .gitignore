@@ -44,11 +44,4 @@ pnpm-debug.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# AI agent tooling (local only)
-CLAUDE.md
-AGENTS.md
-.claude/
-.agents/
-skills-lock.json
-
 .vercel
