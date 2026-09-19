@@ -106,12 +106,18 @@ function queryNtp(host: string): Promise<Offset> {
       const stratum = msg[1]
       if (leap === 3 || mode !== 4 || stratum === 0 || stratum > 15) {
         finish(() =>
-          reject(new Error(`unusable NTP reply (${host}): leap ${leap}, mode ${mode}, stratum ${stratum}`))
+          reject(
+            new Error(
+              `unusable NTP reply (${host}): leap ${leap}, mode ${mode}, stratum ${stratum}`
+            )
+          )
         )
         return
       }
       if (msg.readUInt32BE(40) === 0) {
-        finish(() => reject(new Error(`empty NTP transmit timestamp (${host})`)))
+        finish(() =>
+          reject(new Error(`empty NTP transmit timestamp (${host})`))
+        )
         return
       }
       const t2 = readNtpTimestamp(msg, 32) // server receive
