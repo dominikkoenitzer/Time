@@ -14,6 +14,14 @@ const securityHeaders = [
     value: "geolocation=(), microphone=(), camera=()",
   },
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+  // `unsafe-inline` on script-src is not optional here: Next streams the RSC
+  // payload through inline <script> tags, so a strict policy blanks the page.
+  // The rest of the directives still hold, which is the part worth having.
+  {
+    key: "Content-Security-Policy",
+    value:
+      "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests",
+  },
 ]
 
 const nextConfig: NextConfig = {
