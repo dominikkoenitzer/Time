@@ -97,6 +97,23 @@ function queryNtp(host: string): Promise<Offset> {
         finish(() => reject(new Error(`short NTP packet (${host})`)))
         return
       }
+      // A server that is not synchronised, or is turning us away with a
+      // Kiss-o'-Death, answers with zeroed timestamps. Read literally that is
+      // the NTP epoch, which would put the site in 1900 and, because the
+      // fastest reply wins the race below, it would beat the healthy servers.
+      const leap = msg[0] >> 6
+      const mode = msg[0] & 0b111
+      const stratum = msg[1]
+      if (leap === 3 || mode !== 4 || stratum === 0 || stratum > 15) {
+        finish(() =>
+          reject(new Error(`unusable NTP reply (${host}): leap ${leap}, mode ${mode}, stratum ${stratum}`))
+        )
+        return
+      }
+      if (msg.readUInt32BE(40) === 0) {
+        finish(() => reject(new Error(`empty NTP transmit timestamp (${host})`)))
+        return
+      }
       const t2 = readNtpTimestamp(msg, 32) // server receive
       const t3 = readNtpTimestamp(msg, 40) // server transmit
       finish(() =>
