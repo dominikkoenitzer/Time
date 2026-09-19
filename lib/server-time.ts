@@ -91,6 +91,12 @@ function queryNtp(host: string): Promise<Offset> {
 
     socket.once("message", (msg) => {
       const t4 = Date.now()
+      // A short packet would make the reads below throw inside this handler,
+      // which is an uncaught exception rather than a rejected promise.
+      if (msg.length < 48) {
+        finish(() => reject(new Error(`short NTP packet (${host})`)))
+        return
+      }
       const t2 = readNtpTimestamp(msg, 32) // server receive
       const t3 = readNtpTimestamp(msg, 40) // server transmit
       finish(() =>
