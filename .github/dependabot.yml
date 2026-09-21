@@ -1,7 +1,8 @@
 version: 2
 updates:
-  # Application dependencies (package.json)
-  - package-ecosystem: "npm"
+  # Application dependencies. bun is the canonical tool and bun.lock is
+  # committed, so Dependabot tracks the bun ecosystem.
+  - package-ecosystem: "bun"
     directory: "/"
     schedule:
       interval: "weekly"
