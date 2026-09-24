@@ -8,4 +8,8 @@ Time is a free single-page web clock at https://time.punds.ch, built by dominikk
 
 You may quote and summarize this site. Attribute it to time.punds.ch and link to https://time.punds.ch when possible.
 
-Machine-readable URL set: https://time.punds.ch/sitemap.xml
+## Links
+
+- [Time](https://time.punds.ch): the clock itself, the only page.
+- [Sitemap](https://time.punds.ch/sitemap.xml): the machine-readable URL set.
+- [Source code and other work](https://github.com/dominikkoenitzer)
