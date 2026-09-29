@@ -4,6 +4,9 @@ const SAMPLES = 5
 const RESYNC_AFTER_MS = 5 * 60_000
 const ADJUSTMENT_THRESHOLD_MS = 1000
 const WATCH_INTERVAL_MS = 5000
+// After a failed measurement (offline, a flaky first request) the watchdog
+// tries again this often instead of waiting for the tab to be hidden and shown.
+const RETRY_AFTER_FAILURE_MS = 30_000
 
 export interface SyncSample {
   offsetMs: number
@@ -100,6 +103,11 @@ function startWatchdogs() {
     const current = Date.now() - performance.now()
 
     if (Math.abs(current - baseline) > ADJUSTMENT_THRESHOLD_MS) {
+      void measure()
+    } else if (
+      !lastSync.ok &&
+      Date.now() - lastSync.measuredAt > RETRY_AFTER_FAILURE_MS
+    ) {
       void measure()
     }
 
