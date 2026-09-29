@@ -120,7 +120,9 @@ export function getIsoWeek(wall: WallClock): number {
  * since nothing finer can honestly be claimed.
  */
 export function formatDeviceOffset(offsetMs: number, errorMs: number): string {
-  const margin = `±${formatSeconds(errorMs)}`
+  // Rounded up: a local round trip of a millisecond would otherwise print a
+  // margin of ±0.00 s, a precision nothing here has.
+  const margin = `±${formatSeconds(Math.ceil(errorMs / 10) * 10 || 10)}`
   if (Math.abs(offsetMs) <= errorMs) return `Device exact ${margin}`
   const side = offsetMs > 0 ? "behind" : "ahead"
   return `Device ${formatSeconds(Math.abs(offsetMs))} ${side} ${margin}`
