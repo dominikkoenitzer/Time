@@ -111,3 +111,25 @@ export function getIsoWeek(wall: WallClock): number {
 
   return Math.ceil(((date.getTime() - yearStart) / 86_400_000 + 1) / 7)
 }
+
+/**
+ * How far the visitor's own clock is from the server's, for the caption under
+ * the face. `offsetMs` is server minus device, so a positive offset means the
+ * device runs behind; `errorMs` is half the winning round trip, the most the
+ * measurement can be off by. Inside that margin the device is called exact,
+ * since nothing finer can honestly be claimed.
+ */
+export function formatDeviceOffset(offsetMs: number, errorMs: number): string {
+  const margin = `±${formatSeconds(errorMs)}`
+  if (Math.abs(offsetMs) <= errorMs) return `Device exact ${margin}`
+  const side = offsetMs > 0 ? "behind" : "ahead"
+  return `Device ${formatSeconds(Math.abs(offsetMs))} ${side} ${margin}`
+}
+
+/** 0.34 s, 12.3 s, 125 s: two decimals while they mean something, then fewer. */
+function formatSeconds(ms: number): string {
+  const s = ms / 1000
+  if (s < 10) return `${s.toFixed(2)} s`
+  if (s < 60) return `${s.toFixed(1)} s`
+  return `${Math.round(s)} s`
+}
