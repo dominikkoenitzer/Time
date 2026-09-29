@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest"
 
 import { pickBestSample, sampleOffsetMs, type SyncSample } from "./clock-sync"
 import {
+  formatDeviceOffset,
   formatLongDate,
   formatUtcOffset,
   getIsoWeek,
@@ -221,5 +222,25 @@ describe("getIsoWeek", () => {
         }
       }
     }
+  })
+})
+
+describe("formatDeviceOffset: the caption under the face", () => {
+  it("says behind when the server is ahead of the device", () => {
+    expect(formatDeviceOffset(340, 20)).toBe("Device 0.34 s behind ±0.02 s")
+  })
+
+  it("says ahead when the device runs fast", () => {
+    expect(formatDeviceOffset(-1234, 8)).toBe("Device 1.23 s ahead ±0.01 s")
+  })
+
+  it("calls the device exact inside the measurement's own margin", () => {
+    expect(formatDeviceOffset(15, 20)).toBe("Device exact ±0.02 s")
+    expect(formatDeviceOffset(-20, 20)).toBe("Device exact ±0.02 s")
+  })
+
+  it("drops decimals as the error grows", () => {
+    expect(formatDeviceOffset(12_345, 30)).toBe("Device 12.3 s behind ±0.03 s")
+    expect(formatDeviceOffset(-125_400, 30)).toBe("Device 125 s ahead ±0.03 s")
   })
 })
