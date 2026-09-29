@@ -52,6 +52,29 @@ let appliedOffsetMs = 0
 // when it ran.
 let lastSync = { ok: false, measuredAt: 0 }
 
+/**
+ * What the last good measurement found about the device's own clock, for the
+ * caption that shows it: the offset (server minus device) and the most it can
+ * be wrong by, half the winning round trip. Null until one has succeeded.
+ */
+export interface DeviceClock {
+  offsetMs: number
+  errorMs: number
+}
+
+let deviceClock: DeviceClock | null = null
+const listeners = new Set<() => void>()
+
+/** For useSyncExternalStore: called after every successful measurement. */
+export function subscribeDeviceClock(onChange: () => void): () => void {
+  listeners.add(onChange)
+  return () => listeners.delete(onChange)
+}
+
+export function getDeviceClock(): DeviceClock | null {
+  return deviceClock
+}
+
 /** The current moment, corrected to the server's clock. */
 export function correctedNowMs(): number {
   return Date.now() + appliedOffsetMs
@@ -93,6 +116,8 @@ async function measure() {
 
     appliedOffsetMs = best.offsetMs
     lastSync = { ok: true, measuredAt: Date.now() }
+    deviceClock = { offsetMs: best.offsetMs, errorMs: best.rttMs / 2 }
+    for (const listener of listeners) listener()
   } catch {
     lastSync = { ok: false, measuredAt: Date.now() }
   } finally {
