@@ -3,8 +3,13 @@
 import * as React from "react"
 
 import { useNow } from "@/hooks/use-now"
-import { correctedNowMs } from "@/lib/clock-sync"
 import {
+  correctedNowMs,
+  getDeviceClock,
+  subscribeDeviceClock,
+} from "@/lib/clock-sync"
+import {
+  formatDeviceOffset,
   formatLongDate,
   formatUtcOffset,
   getIsoWeek,
@@ -212,6 +217,11 @@ function Colon() {
 
 export function Clock() {
   const now = useNow()
+  const device = React.useSyncExternalStore(
+    subscribeDeviceClock,
+    getDeviceClock,
+    () => null
+  )
   const wall = now && getWallClock(now)
   const face = React.useRef<HTMLTimeElement>(null)
 
@@ -262,6 +272,18 @@ export function Clock() {
           {now ? formatUtcOffset(-now.getTimezoneOffset()) : <>&nbsp;</>}
         </span>
       </div>
+
+      {/* What the sync measured about the visitor's own clock, the one thing
+          only a synced clock can say. Pinned under the zone like the other
+          captions, and its line is held from the first paint so nothing moves
+          when the measurement lands. */}
+      <p className={`mt-1 ${CAPTION}`}>
+        {device ? (
+          formatDeviceOffset(device.offsetMs, device.errorMs)
+        ) : (
+          <>&nbsp;</>
+        )}
+      </p>
     </div>
   )
 }
