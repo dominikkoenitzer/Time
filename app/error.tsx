@@ -5,9 +5,12 @@ import { Button } from "@/components/ui/button"
 export default function ErrorPage({ reset }: { reset: () => void }) {
   return (
     <div className="mx-auto flex max-w-sm flex-col items-center gap-6 text-center">
-      <p className="font-mono text-7xl leading-none font-medium tracking-[-0.03em] text-muted-foreground/30">
-        --:--:--
-      </p>
+      {/* Decoration, drawn by CSS like the not-found clock: neither read
+          aloud nor held to the text contrast rules. */}
+      <p
+        aria-hidden="true"
+        className="font-mono text-7xl leading-none font-medium tracking-[-0.03em] text-muted-foreground/30 before:content-['--:--:--']"
+      />
       <div className="flex flex-col items-center gap-2">
         <h1 className="text-2xl font-semibold tracking-tight">
           Something went wrong
