@@ -39,6 +39,9 @@ export function pickBestSample(samples: readonly SyncSample[]): SyncSample {
 
 let started = false
 let measuring = false
+// A clock jump seen while a measurement is in flight: that measurement used
+// the old clock, so one more runs as soon as it finishes.
+let remeasure = false
 
 // Offset applied to Date.now() to get server-corrected time. Kept in its own
 // variable so the corrected clock never jumps back to raw device time while a
@@ -67,7 +70,10 @@ export function correctedNowMs(): number {
  * wins; its offset cannot be wrong by more than rtt/2.
  */
 async function measure() {
-  if (measuring) return
+  if (measuring) {
+    remeasure = true
+    return
+  }
   measuring = true
 
   try {
@@ -91,6 +97,10 @@ async function measure() {
     lastSync = { ok: false, measuredAt: Date.now() }
   } finally {
     measuring = false
+    if (remeasure) {
+      remeasure = false
+      void measure()
+    }
   }
 }
 
