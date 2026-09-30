@@ -85,7 +85,7 @@ The site needs no environment variables to run. One optional variable is support
 
 Two layers keep the time honest. On the server, `lib/server-time.ts` disciplines the `/api/time` endpoint against public NTP servers (Cloudflare, Google, `pool.ntp.org`) over UDP, with an HTTP fallback, so the endpoint returns true UTC even if the host's own clock has drifted.
 
-On the client, `lib/clock-sync.ts` samples that endpoint several times. It keeps the sample with the lowest round-trip time, compensates the server timestamp for half that round trip, and treats RTT/2 of the best sample as the accuracy bound. The resulting offset corrects the clock. Watchdogs re-measure when the wall-vs-monotonic baseline jumps (a manual clock change or sleep/wake) or when the tab becomes visible again after the result goes stale.
+On the client, `lib/clock-sync.ts` samples that endpoint several times. It keeps the sample with the lowest round-trip time, compensates the server timestamp for half that round trip, and treats RTT/2 of the best sample as the accuracy bound. The resulting offset corrects the clock. Watchdogs re-measure when the wall-vs-monotonic baseline jumps (a manual clock change or sleep/wake), every 30 seconds after a failed measurement, or when the tab becomes visible again after the result goes stale.
 
 ## Contributing
 
