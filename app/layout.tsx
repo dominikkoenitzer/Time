@@ -56,9 +56,9 @@ const structuredData = {
   browserRequirements: "Requires JavaScript",
   isAccessibleForFree: true,
   author: {
-    "@type": "Person",
-    name: "dominikkoenitzer",
-    url: "https://github.com/dominikkoenitzer",
+    "@type": "Organization",
+    name: SITE_NAME,
+    url: SITE_URL,
   },
 }
 
