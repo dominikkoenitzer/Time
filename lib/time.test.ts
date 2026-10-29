@@ -100,6 +100,15 @@ describe("the sync in the browser", () => {
     })
   }
 
+  // The device's own time service pulls its clock forward 10ms a second,
+  // far too gently for the jump check to notice.
+  async function slewDeviceForward(ms: number) {
+    for (let done = 0; done < ms; done += 50) {
+      vi.setSystemTime(Date.now() + 50)
+      await vi.advanceTimersByTimeAsync(5000)
+    }
+  }
+
   beforeEach(() => {
     vi.useFakeTimers()
     vi.resetModules()
@@ -129,6 +138,35 @@ describe("the sync in the browser", () => {
     await startSync()
 
     await vi.advanceTimersByTimeAsync(60_000)
+
+    expect(requests).toBe(5)
+  })
+
+  it("measures again once the result is old, so it follows the device's own correction", async () => {
+    const sync = await startSync()
+    expect(Math.abs(sync.correctedNowMs() - trueNow())).toBeLessThan(1)
+
+    await slewDeviceForward(2000)
+    await vi.advanceTimersByTimeAsync(5 * 60_000)
+
+    expect(Math.abs(sync.correctedNowMs() - trueNow())).toBeLessThan(1)
+  })
+
+  it("measures an old result once, even when each request is slow", async () => {
+    answerSlowly()
+    await startSync()
+
+    // The first measurement ends at 30s and the next one runs from 335s to 365s.
+    await vi.advanceTimersByTimeAsync(400_000)
+
+    expect(requests).toBe(10)
+  })
+
+  it("does not ask the server while the page is hidden", async () => {
+    await startSync()
+    visibility = "hidden"
+
+    await vi.advanceTimersByTimeAsync(30 * 60_000)
 
     expect(requests).toBe(5)
   })

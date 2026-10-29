@@ -145,6 +145,14 @@ function startWatchdogs() {
       Date.now() - lastSync.measuredAt > RETRY_AFTER_FAILURE_MS
     ) {
       void measure()
+    } else if (
+      // A device's time service slews its clock too gently for the jump check,
+      // so a result that is old gets measured again while the page is in view.
+      !measuring &&
+      document.visibilityState === "visible" &&
+      Date.now() - lastSync.measuredAt > RESYNC_AFTER_MS
+    ) {
+      void measure()
     }
 
     baseline = current
