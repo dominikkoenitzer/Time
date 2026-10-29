@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import { pickBestSample, sampleOffsetMs, type SyncSample } from "./clock-sync"
 import {
@@ -74,6 +74,134 @@ describe("pad", () => {
 
   it("leaves anything already two or more digits alone", () => {
     expect(pad(100)).toBe("100")
+  })
+})
+
+describe("the sync in the browser", () => {
+  // True time runs on the monotonic clock; the device starts 2s behind it.
+  let trueBaseMs = 0
+  const trueNow = () => trueBaseMs + performance.now()
+  let visibility = "visible"
+  let requests = 0
+  let onVisibilityChange = () => {}
+
+  function hideAndShow() {
+    visibility = "hidden"
+    onVisibilityChange()
+    visibility = "visible"
+    onVisibilityChange()
+  }
+
+  async function startSync() {
+    const sync = await import("./clock-sync")
+    sync.ensureClockSync()
+    await vi.advanceTimersByTimeAsync(0)
+    return sync
+  }
+
+  // Each request takes 6s, so one measurement of five takes 30s.
+  function answerSlowly() {
+    vi.stubGlobal("fetch", async () => {
+      requests++
+      await new Promise((done) => setTimeout(done, 6000))
+      return Response.json({ now: trueNow() })
+    })
+  }
+
+  // The device's own time service pulls its clock forward 10ms a second,
+  // far too gently for the jump check to notice.
+  async function slewDeviceForward(ms: number) {
+    for (let done = 0; done < ms; done += 50) {
+      vi.setSystemTime(Date.now() + 50)
+      await vi.advanceTimersByTimeAsync(5000)
+    }
+  }
+
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.resetModules()
+    visibility = "visible"
+    requests = 0
+    trueBaseMs = Date.now() + 2000 - performance.now()
+    vi.stubGlobal("window", globalThis)
+    vi.stubGlobal("document", {
+      get visibilityState() {
+        return visibility
+      },
+      addEventListener: (_type: string, listener: () => void) => {
+        onVisibilityChange = listener
+      },
+    })
+    vi.stubGlobal("fetch", async () => {
+      requests++
+      return Response.json({ now: trueNow() })
+    })
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.useRealTimers()
+  })
+
+  it("measures a slow first load once", async () => {
+    answerSlowly()
+    await startSync()
+
+    await vi.advanceTimersByTimeAsync(60_000)
+
+    expect(requests).toBe(5)
+  })
+
+  it("measures again once the result is old, so it follows the device's own correction", async () => {
+    const sync = await startSync()
+    expect(Math.abs(sync.correctedNowMs() - trueNow())).toBeLessThan(1)
+
+    await slewDeviceForward(2000)
+    await vi.advanceTimersByTimeAsync(5 * 60_000)
+
+    expect(Math.abs(sync.correctedNowMs() - trueNow())).toBeLessThan(1)
+  })
+
+  it("measures an old result once, even when each request is slow", async () => {
+    answerSlowly()
+    await startSync()
+
+    // The first measurement ends at 30s and the next one runs from 335s to 365s.
+    await vi.advanceTimersByTimeAsync(400_000)
+
+    expect(requests).toBe(10)
+  })
+
+  it("does not ask the server while the page is hidden", async () => {
+    await startSync()
+    visibility = "hidden"
+
+    await vi.advanceTimersByTimeAsync(30 * 60_000)
+
+    expect(requests).toBe(5)
+  })
+
+  it("measures an old result once when the page is hidden and shown during it", async () => {
+    answerSlowly()
+    await startSync()
+    await vi.advanceTimersByTimeAsync(336_000)
+
+    hideAndShow()
+    await vi.advanceTimersByTimeAsync(64_000)
+
+    expect(requests).toBe(10)
+  })
+
+  it("measures an old result once when the page is shown twice in one tick", async () => {
+    await startSync()
+    visibility = "hidden"
+    await vi.advanceTimersByTimeAsync(6 * 60_000)
+
+    hideAndShow()
+    hideAndShow()
+    await vi.advanceTimersByTimeAsync(60_000)
+
+    expect(requests).toBe(10)
   })
 })
 

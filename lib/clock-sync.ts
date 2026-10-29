@@ -140,8 +140,17 @@ function startWatchdogs() {
     if (Math.abs(current - baseline) > ADJUSTMENT_THRESHOLD_MS) {
       void measure()
     } else if (
+      !measuring &&
       !lastSync.ok &&
       Date.now() - lastSync.measuredAt > RETRY_AFTER_FAILURE_MS
+    ) {
+      void measure()
+    } else if (
+      // A device's time service slews its clock too gently for the jump check,
+      // so a result that is old gets measured again while the page is in view.
+      !measuring &&
+      document.visibilityState === "visible" &&
+      Date.now() - lastSync.measuredAt > RESYNC_AFTER_MS
     ) {
       void measure()
     }
@@ -155,7 +164,7 @@ function startWatchdogs() {
     const stale =
       !lastSync.ok || Date.now() - lastSync.measuredAt > RESYNC_AFTER_MS
 
-    if (stale) void measure()
+    if (stale && !measuring) void measure()
   })
 }
 

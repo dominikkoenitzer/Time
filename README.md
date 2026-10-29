@@ -5,7 +5,7 @@
 Time shows the precise, server-corrected current time, synchronized the same way NTP works, so it stays right even when the device you're viewing it on is set wrong. The whole site is one screen, greyscale and centred. Nothing to scroll, nothing to click, nothing to dismiss.
 
 [![CI](https://github.com/dominikkoenitzer/Time/actions/workflows/ci.yml/badge.svg)](https://github.com/dominikkoenitzer/Time/actions/workflows/ci.yml)
-[![tests](https://img.shields.io/badge/tests-33%20passing-3178c6)](lib/time.test.ts)
+[![tests](https://img.shields.io/badge/tests-39%20passing-3178c6)](lib/time.test.ts)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=nextdotjs)
 ![TypeScript](https://img.shields.io/badge/TypeScript-6-3178c6?logo=typescript&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss&logoColor=white)
@@ -22,7 +22,7 @@ Time shows the precise, server-corrected current time, synchronized the same way
 - **Server-corrected time everywhere.** The displayed clock is drawn from the measured server offset, so it stays right even if the device it runs on is set wrong.
 - **One screen, and nothing else.** One centred block in a single monospaced face: the clock, with the long date, ISO week, zone name and UTC offset registered to the clock's own edges rather than the screen's. No panels, no banners, no settings, and the page cannot scroll.
 - **One gesture, and one colour.** The face assembles once and is then still. The colons dwell dark for the last 100ms of every second and return exactly on the tick, the way a station clock waits for the impulse from its master, and they are the only thing on the site that carries colour.
-- **Named timezone, not just an offset.** The clock says "Central European Summer Time (UTC+02:00)", read from the browser's own `Intl` data, so it follows the visitor in and out of summer time on its own.
+- **Named timezone, not just an offset.** The clock says "Central European Summer Time" and, opposite it, "UTC+02:00", read from the browser's own `Intl` data, so it follows the visitor in and out of summer time on its own.
 - **No external time APIs and no timezone data files.** The current time is computed client-side with the built-in `Intl` APIs. The server's only job is the `/api/time` endpoint, which returns NTP-disciplined true UTC for the sync check.
 
 ## Tech stack
@@ -85,7 +85,7 @@ The site needs no environment variables to run. One optional variable is support
 
 Two layers keep the time honest. On the server, `lib/server-time.ts` disciplines the `/api/time` endpoint against public NTP servers (Cloudflare, Google, `pool.ntp.org`) over UDP, with an HTTP fallback, so the endpoint returns true UTC even if the host's own clock has drifted.
 
-On the client, `lib/clock-sync.ts` samples that endpoint several times. It keeps the sample with the lowest round-trip time, compensates the server timestamp for half that round trip, and treats RTT/2 of the best sample as the accuracy bound. The resulting offset corrects the clock. Watchdogs re-measure when the wall-vs-monotonic baseline jumps (a manual clock change or sleep/wake), every 30 seconds after a failed measurement, or when the tab becomes visible again after the result goes stale.
+On the client, `lib/clock-sync.ts` samples that endpoint several times. It keeps the sample with the lowest round-trip time, compensates the server timestamp for half that round trip, and treats RTT/2 of the best sample as the accuracy bound. The resulting offset corrects the clock. Watchdogs re-measure when the wall-vs-monotonic baseline jumps (a manual clock change or sleep/wake), every 30 seconds after a failed measurement, once the result is five minutes old while the page is in view, or when the tab becomes visible again after the result goes stale.
 
 ## Contributing
 
