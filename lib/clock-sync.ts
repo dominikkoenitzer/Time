@@ -140,6 +140,7 @@ function startWatchdogs() {
     if (Math.abs(current - baseline) > ADJUSTMENT_THRESHOLD_MS) {
       void measure()
     } else if (
+      !measuring &&
       !lastSync.ok &&
       Date.now() - lastSync.measuredAt > RETRY_AFTER_FAILURE_MS
     ) {

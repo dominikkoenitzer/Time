@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import { pickBestSample, sampleOffsetMs, type SyncSample } from "./clock-sync"
 import {
@@ -74,6 +74,63 @@ describe("pad", () => {
 
   it("leaves anything already two or more digits alone", () => {
     expect(pad(100)).toBe("100")
+  })
+})
+
+describe("the sync in the browser", () => {
+  // True time runs on the monotonic clock; the device starts 2s behind it.
+  let trueBaseMs = 0
+  const trueNow = () => trueBaseMs + performance.now()
+  let visibility = "visible"
+  let requests = 0
+
+  async function startSync() {
+    const sync = await import("./clock-sync")
+    sync.ensureClockSync()
+    await vi.advanceTimersByTimeAsync(0)
+    return sync
+  }
+
+  // Each request takes 6s, so one measurement of five takes 30s.
+  function answerSlowly() {
+    vi.stubGlobal("fetch", async () => {
+      requests++
+      await new Promise((done) => setTimeout(done, 6000))
+      return Response.json({ now: trueNow() })
+    })
+  }
+
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.resetModules()
+    visibility = "visible"
+    requests = 0
+    trueBaseMs = Date.now() + 2000 - performance.now()
+    vi.stubGlobal("window", globalThis)
+    vi.stubGlobal("document", {
+      get visibilityState() {
+        return visibility
+      },
+      addEventListener: () => {},
+    })
+    vi.stubGlobal("fetch", async () => {
+      requests++
+      return Response.json({ now: trueNow() })
+    })
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.useRealTimers()
+  })
+
+  it("measures a slow first load once", async () => {
+    answerSlowly()
+    await startSync()
+
+    await vi.advanceTimersByTimeAsync(60_000)
+
+    expect(requests).toBe(5)
   })
 })
 
