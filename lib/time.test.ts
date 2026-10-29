@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import { pickBestSample, sampleOffsetMs, type SyncSample } from "./clock-sync"
 import {
@@ -253,5 +253,76 @@ describe("formatDeviceOffset: the caption under the face", () => {
     expect(formatDeviceOffset(9_996, 30)).toBe("Device 10.0 s behind ±0.03 s")
     expect(formatDeviceOffset(-59_960, 30)).toBe("Device 60 s ahead ±0.03 s")
     expect(formatDeviceOffset(0, 59_990)).toBe("Device exact ±60 s")
+  })
+})
+
+describe("getServerTime after a failed lookup", () => {
+  // The HTTP source answers with a clock 1.5 s ahead of the host.
+  const answer = async () => new Response(`ts=${(Date.now() + 1500) / 1000}\n`)
+
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ["Date"] })
+    vi.setSystemTime(Date.UTC(2026, 0, 1))
+    vi.resetModules()
+    // Every NTP query fails at once, as it does where UDP is blocked.
+    vi.doMock("node:dgram", () => ({
+      default: {
+        createSocket: () => ({
+          once: () => {},
+          close: () => {},
+          send: (...args: unknown[]) =>
+            (args[3] as (err: Error) => void)(new Error("blocked")),
+        }),
+      },
+    }))
+  })
+
+  afterEach(() => {
+    vi.doUnmock("node:dgram")
+    vi.unstubAllGlobals()
+    vi.useRealTimers()
+  })
+
+  const later = (ms: number) => vi.setSystemTime(Date.now() + ms)
+
+  it("tries again soon instead of serving the host clock for minutes", async () => {
+    const fetch = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("offline"))
+      .mockImplementation(answer)
+    vi.stubGlobal("fetch", fetch)
+    const { getServerTime } = await import("./server-time")
+
+    expect((await getServerTime()).source).toBe("uncorrected")
+    later(30_000)
+    const time = await getServerTime()
+    expect(time.source).toBe("http:cloudflare")
+    expect(time.offsetMs).toBe(1500)
+  })
+
+  it("does not ask the sources on every request while they are down", async () => {
+    const fetch = vi.fn().mockRejectedValue(new Error("offline"))
+    vi.stubGlobal("fetch", fetch)
+    const { getServerTime } = await import("./server-time")
+
+    await getServerTime()
+    await getServerTime()
+    later(29_000)
+    expect((await getServerTime()).source).toBe("uncorrected")
+    expect(fetch).toHaveBeenCalledTimes(1)
+  })
+
+  it("still trusts a real measurement for five minutes", async () => {
+    const fetch = vi.fn().mockImplementation(answer)
+    vi.stubGlobal("fetch", fetch)
+    const { getServerTime } = await import("./server-time")
+
+    await getServerTime()
+    later(4 * 60_000)
+    await getServerTime()
+    expect(fetch).toHaveBeenCalledTimes(1)
+    later(60_000)
+    await getServerTime()
+    expect(fetch).toHaveBeenCalledTimes(2)
   })
 })

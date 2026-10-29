@@ -26,6 +26,9 @@ const HTTP_TIMEOUT_MS = 1200
 // virtually every request a cache hit.
 const REFRESH_AFTER_MS = 5 * 60_000
 
+// After a failed lookup the host clock is served this long before the next try.
+const RETRY_AFTER_FAILURE_MS = 30_000
+
 // Seconds between the NTP epoch (1900-01-01) and the Unix epoch (1970-01-01).
 const NTP_UNIX_EPOCH_DIFF = 2_208_988_800
 
@@ -178,7 +181,9 @@ async function measureOffset(): Promise<Offset | null> {
 }
 
 async function getOffset(): Promise<Offset> {
-  if (cached && Date.now() - cached.at < REFRESH_AFTER_MS) return cached
+  const trustedFor =
+    cached?.source === "uncorrected" ? RETRY_AFTER_FAILURE_MS : REFRESH_AFTER_MS
+  if (cached && Date.now() - cached.at < trustedFor) return cached
 
   // Coalesce concurrent refreshes into a single measurement.
   if (!inFlight) {
