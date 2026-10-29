@@ -76,6 +76,24 @@ describe("the sync against /api/time", () => {
   // The server is 5s ahead of the device.
   const ahead: Fetch = async () => Response.json({ now: Date.now() + 5000 })
 
+  // Like a real fetch, it only ever ends when its signal aborts.
+  const hung: Fetch = (_url, init) =>
+    new Promise((_resolve, reject) => {
+      init?.signal?.addEventListener("abort", () => reject(init.signal?.reason))
+    })
+
+  // Headers arrive, then the body stalls until the signal aborts.
+  const stalled: Fetch = async (_url, init) =>
+    new Response(
+      new ReadableStream({
+        start(body) {
+          init?.signal?.addEventListener("abort", () =>
+            body.error(init.signal?.reason)
+          )
+        },
+      })
+    )
+
   async function startSync(...replies: Fetch[]) {
     let call = 0
     vi.stubGlobal("fetch", (url: string, init?: RequestInit) =>
@@ -125,6 +143,15 @@ describe("the sync against /api/time", () => {
     vi.setSystemTime(Date.now() + 60_000)
     await vi.advanceTimersByTimeAsync(5000)
     expect(sync.correctedNowMs()).toBe(Date.now() + 5000)
+  })
+
+  it.each([
+    ["a hung request", hung],
+    ["a reply whose body stalls", stalled],
+  ])("gives up on %s, so a later sync can still run", async (_name, slow) => {
+    const sync = await startSync(slow, ahead)
+    await vi.advanceTimersByTimeAsync(60_000)
+    expect(sync.getDeviceClock()).toEqual({ offsetMs: 5000, errorMs: 0 })
   })
 })
 
