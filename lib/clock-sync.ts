@@ -107,7 +107,12 @@ async function measure() {
       const startMono = performance.now()
       const response = await fetch("/api/time", { cache: "no-store" })
       const rttMs = performance.now() - startMono
-      const { now } = (await response.json()) as { now: number }
+      if (!response.ok) throw new Error(`/api/time answered ${response.status}`)
+      const { now } = (await response.json()) as { now?: unknown }
+      // A reply without a usable time fails the measurement like a lost one.
+      if (typeof now !== "number" || !Number.isFinite(now)) {
+        throw new Error("/api/time sent no time")
+      }
 
       samples.push({ offsetMs: sampleOffsetMs(now, startWall, rttMs), rttMs })
     }

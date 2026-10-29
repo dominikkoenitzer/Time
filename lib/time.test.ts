@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import { pickBestSample, sampleOffsetMs, type SyncSample } from "./clock-sync"
 import {
@@ -62,6 +62,69 @@ describe("pickBestSample", () => {
 
   it("handles a single sample", () => {
     expect(pickBestSample([{ offsetMs: 7, rttMs: 9 }]).offsetMs).toBe(7)
+  })
+})
+
+describe("the sync against /api/time", () => {
+  type Fetch = (url: string, init?: RequestInit) => Promise<Response>
+
+  const reply =
+    (body: unknown, status = 200): Fetch =>
+    async () =>
+      Response.json(body, { status })
+
+  // The server is 5s ahead of the device.
+  const ahead: Fetch = async () => Response.json({ now: Date.now() + 5000 })
+
+  async function startSync(...replies: Fetch[]) {
+    let call = 0
+    vi.stubGlobal("fetch", (url: string, init?: RequestInit) =>
+      replies[Math.min(call++, replies.length - 1)](url, init)
+    )
+    const sync = await import("./clock-sync")
+    sync.ensureClockSync()
+    await vi.advanceTimersByTimeAsync(0)
+    return sync
+  }
+
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.resetModules()
+    vi.stubGlobal("window", globalThis)
+    vi.stubGlobal("document", {
+      visibilityState: "visible",
+      addEventListener: () => {},
+    })
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.useRealTimers()
+  })
+
+  it("applies the offset the server reports", async () => {
+    const sync = await startSync(ahead)
+    expect(sync.correctedNowMs()).toBe(Date.now() + 5000)
+    expect(sync.getDeviceClock()).toEqual({ offsetMs: 5000, errorMs: 0 })
+  })
+
+  it.each([
+    ["an error reply in JSON", reply({ error: "Bad gateway" }, 502)],
+    ["an error reply that carries a time", reply({ now: 0 }, 500)],
+    ["a reply without now", reply({ source: "uncorrected" })],
+    ["a reply with a null now", reply({ now: null })],
+  ])("keeps the device clock after %s", async (_name, bad) => {
+    const sync = await startSync(bad)
+    expect(sync.correctedNowMs()).toBe(Date.now())
+    expect(sync.getDeviceClock()).toBeNull()
+  })
+
+  it("keeps the last good offset when a later reply is bad", async () => {
+    const sync = await startSync(ahead, ahead, ahead, ahead, ahead, reply({}))
+    // A clock step makes the watchdog measure again.
+    vi.setSystemTime(Date.now() + 60_000)
+    await vi.advanceTimersByTimeAsync(5000)
+    expect(sync.correctedNowMs()).toBe(Date.now() + 5000)
   })
 })
 
