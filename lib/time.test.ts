@@ -83,6 +83,14 @@ describe("the sync in the browser", () => {
   const trueNow = () => trueBaseMs + performance.now()
   let visibility = "visible"
   let requests = 0
+  let onVisibilityChange = () => {}
+
+  function hideAndShow() {
+    visibility = "hidden"
+    onVisibilityChange()
+    visibility = "visible"
+    onVisibilityChange()
+  }
 
   async function startSync() {
     const sync = await import("./clock-sync")
@@ -120,7 +128,9 @@ describe("the sync in the browser", () => {
       get visibilityState() {
         return visibility
       },
-      addEventListener: () => {},
+      addEventListener: (_type: string, listener: () => void) => {
+        onVisibilityChange = listener
+      },
     })
     vi.stubGlobal("fetch", async () => {
       requests++
@@ -169,6 +179,29 @@ describe("the sync in the browser", () => {
     await vi.advanceTimersByTimeAsync(30 * 60_000)
 
     expect(requests).toBe(5)
+  })
+
+  it("measures an old result once when the page is hidden and shown during it", async () => {
+    answerSlowly()
+    await startSync()
+    await vi.advanceTimersByTimeAsync(336_000)
+
+    hideAndShow()
+    await vi.advanceTimersByTimeAsync(64_000)
+
+    expect(requests).toBe(10)
+  })
+
+  it("measures an old result once when the page is shown twice in one tick", async () => {
+    await startSync()
+    visibility = "hidden"
+    await vi.advanceTimersByTimeAsync(6 * 60_000)
+
+    hideAndShow()
+    hideAndShow()
+    await vi.advanceTimersByTimeAsync(60_000)
+
+    expect(requests).toBe(10)
   })
 })
 

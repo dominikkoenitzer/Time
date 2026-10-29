@@ -5,7 +5,7 @@
 Time shows the precise, server-corrected current time, synchronized the same way NTP works, so it stays right even when the device you're viewing it on is set wrong. The whole site is one screen, greyscale and centred. Nothing to scroll, nothing to click, nothing to dismiss.
 
 [![CI](https://github.com/dominikkoenitzer/Time/actions/workflows/ci.yml/badge.svg)](https://github.com/dominikkoenitzer/Time/actions/workflows/ci.yml)
-[![tests](https://img.shields.io/badge/tests-37%20passing-3178c6)](lib/time.test.ts)
+[![tests](https://img.shields.io/badge/tests-39%20passing-3178c6)](lib/time.test.ts)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=nextdotjs)
 ![TypeScript](https://img.shields.io/badge/TypeScript-6-3178c6?logo=typescript&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss&logoColor=white)

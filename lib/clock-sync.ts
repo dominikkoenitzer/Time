@@ -164,7 +164,7 @@ function startWatchdogs() {
     const stale =
       !lastSync.ok || Date.now() - lastSync.measuredAt > RESYNC_AFTER_MS
 
-    if (stale) void measure()
+    if (stale && !measuring) void measure()
   })
 }
 
