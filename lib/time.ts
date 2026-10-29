@@ -131,7 +131,10 @@ export function formatDeviceOffset(offsetMs: number, errorMs: number): string {
 /** 0.34 s, 12.3 s, 125 s: two decimals while they mean something, then fewer. */
 function formatSeconds(ms: number): string {
   const s = ms / 1000
-  if (s < 10) return `${s.toFixed(2)} s`
-  if (s < 60) return `${s.toFixed(1)} s`
+  // Rounded first, so 9.996 s cannot come out as 10.00 s.
+  const hundredths = s.toFixed(2)
+  if (Number(hundredths) < 10) return `${hundredths} s`
+  const tenths = s.toFixed(1)
+  if (Number(tenths) < 60) return `${tenths} s`
   return `${Math.round(s)} s`
 }

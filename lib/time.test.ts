@@ -248,4 +248,10 @@ describe("formatDeviceOffset: the caption under the face", () => {
     expect(formatDeviceOffset(12_345, 30)).toBe("Device 12.3 s behind ±0.03 s")
     expect(formatDeviceOffset(-125_400, 30)).toBe("Device 125 s ahead ±0.03 s")
   })
+
+  it("rounds before it picks how many decimals to show", () => {
+    expect(formatDeviceOffset(9_996, 30)).toBe("Device 10.0 s behind ±0.03 s")
+    expect(formatDeviceOffset(-59_960, 30)).toBe("Device 60 s ahead ±0.03 s")
+    expect(formatDeviceOffset(0, 59_990)).toBe("Device exact ±60 s")
+  })
 })
