@@ -7,6 +7,8 @@ const WATCH_INTERVAL_MS = 5000
 // After a failed measurement (offline, a flaky first request) the watchdog
 // tries again this often instead of waiting for the tab to be hidden and shown.
 const RETRY_AFTER_FAILURE_MS = 30_000
+// A request still open after this, body included, is dropped so syncs go on.
+const REQUEST_TIMEOUT_MS = 10_000
 
 export interface SyncSample {
   offsetMs: number
@@ -103,13 +105,29 @@ async function measure() {
     const samples: SyncSample[] = []
 
     for (let i = 0; i < SAMPLES; i++) {
-      const startWall = Date.now()
-      const startMono = performance.now()
-      const response = await fetch("/api/time", { cache: "no-store" })
-      const rttMs = performance.now() - startMono
-      const { now } = (await response.json()) as { now: number }
+      const abort = new AbortController()
+      const timer = setTimeout(() => abort.abort(), REQUEST_TIMEOUT_MS)
+      try {
+        const startWall = Date.now()
+        const startMono = performance.now()
+        const response = await fetch("/api/time", {
+          cache: "no-store",
+          signal: abort.signal,
+        })
+        const rttMs = performance.now() - startMono
+        if (!response.ok) {
+          throw new Error(`/api/time answered ${response.status}`)
+        }
+        const { now } = (await response.json()) as { now?: unknown }
+        // A reply without a usable time fails the measurement like a lost one.
+        if (typeof now !== "number" || !Number.isFinite(now)) {
+          throw new Error("/api/time sent no time")
+        }
 
-      samples.push({ offsetMs: sampleOffsetMs(now, startWall, rttMs), rttMs })
+        samples.push({ offsetMs: sampleOffsetMs(now, startWall, rttMs), rttMs })
+      } finally {
+        clearTimeout(timer)
+      }
     }
 
     const best = pickBestSample(samples)

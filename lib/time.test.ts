@@ -65,6 +65,96 @@ describe("pickBestSample", () => {
   })
 })
 
+describe("the sync against /api/time", () => {
+  type Fetch = (url: string, init?: RequestInit) => Promise<Response>
+
+  const reply =
+    (body: unknown, status = 200): Fetch =>
+    async () =>
+      Response.json(body, { status })
+
+  // The server is 5s ahead of the device.
+  const ahead: Fetch = async () => Response.json({ now: Date.now() + 5000 })
+
+  // Like a real fetch, it only ever ends when its signal aborts.
+  const hung: Fetch = (_url, init) =>
+    new Promise((_resolve, reject) => {
+      init?.signal?.addEventListener("abort", () => reject(init.signal?.reason))
+    })
+
+  // Headers arrive, then the body stalls until the signal aborts.
+  const stalled: Fetch = async (_url, init) =>
+    new Response(
+      new ReadableStream({
+        start(body) {
+          init?.signal?.addEventListener("abort", () =>
+            body.error(init.signal?.reason)
+          )
+        },
+      })
+    )
+
+  async function startSync(...replies: Fetch[]) {
+    let call = 0
+    vi.stubGlobal("fetch", (url: string, init?: RequestInit) =>
+      replies[Math.min(call++, replies.length - 1)](url, init)
+    )
+    const sync = await import("./clock-sync")
+    sync.ensureClockSync()
+    await vi.advanceTimersByTimeAsync(0)
+    return sync
+  }
+
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.resetModules()
+    vi.stubGlobal("window", globalThis)
+    vi.stubGlobal("document", {
+      visibilityState: "visible",
+      addEventListener: () => {},
+    })
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.useRealTimers()
+  })
+
+  it("applies the offset the server reports", async () => {
+    const sync = await startSync(ahead)
+    expect(sync.correctedNowMs()).toBe(Date.now() + 5000)
+    expect(sync.getDeviceClock()).toEqual({ offsetMs: 5000, errorMs: 0 })
+  })
+
+  it.each([
+    ["an error reply in JSON", reply({ error: "Bad gateway" }, 502)],
+    ["an error reply that carries a time", reply({ now: 0 }, 500)],
+    ["a reply without now", reply({ source: "uncorrected" })],
+    ["a reply with a null now", reply({ now: null })],
+  ])("keeps the device clock after %s", async (_name, bad) => {
+    const sync = await startSync(bad)
+    expect(sync.correctedNowMs()).toBe(Date.now())
+    expect(sync.getDeviceClock()).toBeNull()
+  })
+
+  it("keeps the last good offset when a later reply is bad", async () => {
+    const sync = await startSync(ahead, ahead, ahead, ahead, ahead, reply({}))
+    // A clock step makes the watchdog measure again.
+    vi.setSystemTime(Date.now() + 60_000)
+    await vi.advanceTimersByTimeAsync(5000)
+    expect(sync.correctedNowMs()).toBe(Date.now() + 5000)
+  })
+
+  it.each([
+    ["a hung request", hung],
+    ["a reply whose body stalls", stalled],
+  ])("gives up on %s, so a later sync can still run", async (_name, slow) => {
+    const sync = await startSync(slow, ahead)
+    await vi.advanceTimersByTimeAsync(60_000)
+    expect(sync.getDeviceClock()).toEqual({ offsetMs: 5000, errorMs: 0 })
+  })
+})
+
 describe("pad", () => {
   it("pads single digits to two", () => {
     expect(pad(0)).toBe("00")
