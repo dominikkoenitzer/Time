@@ -107,6 +107,7 @@ async function measure() {
     for (let i = 0; i < SAMPLES; i++) {
       const abort = new AbortController()
       const timer = setTimeout(() => abort.abort(), REQUEST_TIMEOUT_MS)
+      // A lost or bad reply costs only its own sample.
       try {
         const startWall = Date.now()
         const startMono = performance.now()
@@ -125,11 +126,14 @@ async function measure() {
         }
 
         samples.push({ offsetMs: sampleOffsetMs(now, startWall, rttMs), rttMs })
+      } catch {
+        continue
       } finally {
         clearTimeout(timer)
       }
     }
 
+    if (samples.length === 0) throw new Error("/api/time never answered")
     const best = pickBestSample(samples)
 
     appliedOffsetMs = best.offsetMs

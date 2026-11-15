@@ -76,6 +76,11 @@ describe("the sync against /api/time", () => {
   // The server is 5s ahead of the device.
   const ahead: Fetch = async () => Response.json({ now: Date.now() + 5000 })
 
+  // The network drops the request, as a phone link does now and then.
+  const lost: Fetch = async () => {
+    throw new TypeError("Failed to fetch")
+  }
+
   // Like a real fetch, it only ever ends when its signal aborts.
   const hung: Fetch = (_url, init) =>
     new Promise((_resolve, reject) => {
@@ -144,6 +149,19 @@ describe("the sync against /api/time", () => {
     await vi.advanceTimersByTimeAsync(5000)
     expect(sync.correctedNowMs()).toBe(Date.now() + 5000)
   })
+
+  it.each([
+    ["the first", [lost, ahead]],
+    ["a middle", [ahead, ahead, lost, ahead]],
+    ["the last", [ahead, ahead, ahead, ahead, reply({}, 502)]],
+  ])(
+    "measures with the rest when %s request is lost",
+    async (_name, replies) => {
+      const sync = await startSync(...replies)
+      expect(sync.correctedNowMs()).toBe(Date.now() + 5000)
+      expect(sync.getDeviceClock()).toEqual({ offsetMs: 5000, errorMs: 0 })
+    }
+  )
 
   it.each([
     ["a hung request", hung],
