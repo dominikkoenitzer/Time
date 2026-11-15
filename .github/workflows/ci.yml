@@ -52,3 +52,10 @@ jobs:
 
       - name: Build
         run: bun run build
+
+      # Serves the build and loads the clock in Chrome, with WebGL and without, at 1440, 390 and 360 px.
+      - name: Load the build
+        run: |
+          bun run start &
+          curl --retry 30 --retry-delay 1 --retry-connrefused -sfo /dev/null http://localhost:1000/
+          bun .github/load-check.mjs
