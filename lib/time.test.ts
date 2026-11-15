@@ -76,6 +76,15 @@ describe("the sync against /api/time", () => {
   // The server is 5s ahead of the device.
   const ahead: Fetch = async () => Response.json({ now: Date.now() + 5000 })
 
+  // The network drops the request, as a phone link does now and then.
+  const lost: Fetch = async () => {
+    throw new TypeError("Failed to fetch")
+  }
+
+  // The server reached no time source and answers with its own clock.
+  const unchecked: Fetch = async () =>
+    Response.json({ now: Date.now() + 5000, source: "uncorrected" })
+
   // Like a real fetch, it only ever ends when its signal aborts.
   const hung: Fetch = (_url, init) =>
     new Promise((_resolve, reject) => {
@@ -143,6 +152,33 @@ describe("the sync against /api/time", () => {
     vi.setSystemTime(Date.now() + 60_000)
     await vi.advanceTimersByTimeAsync(5000)
     expect(sync.correctedNowMs()).toBe(Date.now() + 5000)
+  })
+
+  it.each([
+    ["the first", [lost, ahead]],
+    ["a middle", [ahead, ahead, lost, ahead]],
+    ["the last", [ahead, ahead, ahead, ahead, reply({}, 502)]],
+  ])(
+    "measures with the rest when %s request is lost",
+    async (_name, replies) => {
+      const sync = await startSync(...replies)
+      expect(sync.correctedNowMs()).toBe(Date.now() + 5000)
+      expect(sync.getDeviceClock()).toEqual({ offsetMs: 5000, errorMs: 0 })
+    }
+  )
+
+  it("does not call the device exact against a server that checked nothing", async () => {
+    const sync = await startSync(unchecked)
+    expect(sync.correctedNowMs()).toBe(Date.now() + 5000)
+    expect(sync.getDeviceClock()).toBeNull()
+  })
+
+  it("drops the device caption when a later server reply is unchecked", async () => {
+    const sync = await startSync(ahead, ahead, ahead, ahead, ahead, unchecked)
+    expect(sync.getDeviceClock()).not.toBeNull()
+    vi.setSystemTime(Date.now() + 60_000)
+    await vi.advanceTimersByTimeAsync(5000)
+    expect(sync.getDeviceClock()).toBeNull()
   })
 
   it.each([
