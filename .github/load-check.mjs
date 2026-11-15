@@ -4,7 +4,8 @@ import { mkdtempSync, rmSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 
-const PAGE = "http://localhost:1000/"
+// Not 1000: a GitHub runner runs as a normal user and may not bind a port under 1024.
+const PAGE = "http://localhost:4311/"
 const SHOW_WITHIN_MS = 20_000
 const SETTLE_MS = 3000
 
