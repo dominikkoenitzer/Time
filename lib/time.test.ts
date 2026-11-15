@@ -239,6 +239,12 @@ describe("formatDeviceOffset: the caption under the face", () => {
     expect(formatDeviceOffset(-20, 20)).toBe("Device exact ±0.02 s")
   })
 
+  it("calls an offset inside the printed margin exact, never 0.00 s", () => {
+    expect(formatDeviceOffset(4, 1)).toBe("Device exact ±0.01 s")
+    expect(formatDeviceOffset(-6, 3)).toBe("Device exact ±0.01 s")
+    expect(formatDeviceOffset(12, 8)).toBe("Device 0.01 s behind ±0.01 s")
+  })
+
   it("rounds the margin up, never down to zero", () => {
     expect(formatDeviceOffset(3130, 0.4)).toBe("Device 3.13 s behind ±0.01 s")
     expect(formatDeviceOffset(3130, 11)).toBe("Device 3.13 s behind ±0.02 s")
