@@ -15,7 +15,7 @@ bun run dev        # http://localhost:1000
 
 ## Before you open a pull request
 
-Run the same gate CI runs. All five have to pass:
+Run the same gate CI runs. All six have to pass:
 
 ```bash
 bun run typecheck
@@ -23,9 +23,10 @@ bun run lint
 bun run format:check    # or `bun run format` to auto-fix
 bun run test
 bun run build
+bun run e2e             # needs `bunx playwright install` once
 ```
 
-The tests (Vitest, `lib/time.test.ts`) cover the time math. Verify anything visual by running the app and exercising the affected behavior.
+The unit tests (Vitest, `lib/*.test.ts`) cover the time math, and the browser tests (Playwright, `e2e/`) load the page in Chromium, Firefox and WebKit. Verify anything visual by running the app and exercising the affected behavior.
 
 ## Code style
 

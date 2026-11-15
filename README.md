@@ -53,7 +53,8 @@ bun run dev        # dev server at http://localhost:1000
 | `bun run lint`         | ESLint                                |
 | `bun run format`       | Format `**/*.{ts,tsx}` with Prettier  |
 | `bun run format:check` | Verify formatting without writing     |
-| `bun run test`         | Vitest suite (`lib/time.test.ts`)     |
+| `bun run test`         | Vitest suite (`lib/*.test.ts`)        |
+| `bun run e2e`          | Playwright browser tests (`e2e/`)     |
 
 > The tests cover the parts that are easy to get quietly wrong: the NTP offset
 > maths (including that a sample's error is bounded by half the round trip, and
