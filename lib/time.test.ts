@@ -81,6 +81,10 @@ describe("the sync against /api/time", () => {
     throw new TypeError("Failed to fetch")
   }
 
+  // The server reached no time source and answers with its own clock.
+  const unchecked: Fetch = async () =>
+    Response.json({ now: Date.now() + 5000, source: "uncorrected" })
+
   // Like a real fetch, it only ever ends when its signal aborts.
   const hung: Fetch = (_url, init) =>
     new Promise((_resolve, reject) => {
@@ -162,6 +166,20 @@ describe("the sync against /api/time", () => {
       expect(sync.getDeviceClock()).toEqual({ offsetMs: 5000, errorMs: 0 })
     }
   )
+
+  it("does not call the device exact against a server that checked nothing", async () => {
+    const sync = await startSync(unchecked)
+    expect(sync.correctedNowMs()).toBe(Date.now() + 5000)
+    expect(sync.getDeviceClock()).toBeNull()
+  })
+
+  it("drops the device caption when a later server reply is unchecked", async () => {
+    const sync = await startSync(ahead, ahead, ahead, ahead, ahead, unchecked)
+    expect(sync.getDeviceClock()).not.toBeNull()
+    vi.setSystemTime(Date.now() + 60_000)
+    await vi.advanceTimersByTimeAsync(5000)
+    expect(sync.getDeviceClock()).toBeNull()
+  })
 
   it.each([
     ["a hung request", hung],
