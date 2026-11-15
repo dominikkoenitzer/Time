@@ -457,9 +457,25 @@ describe("formatDeviceOffset: the caption under the face", () => {
     expect(formatDeviceOffset(-20, 20)).toBe("Device exact ±0.02 s")
   })
 
+  it("calls an offset inside the printed margin exact, never 0.00 s", () => {
+    expect(formatDeviceOffset(4, 1)).toBe("Device exact ±0.01 s")
+    expect(formatDeviceOffset(-6, 3)).toBe("Device exact ±0.01 s")
+    expect(formatDeviceOffset(12, 8)).toBe("Device 0.01 s behind ±0.01 s")
+  })
+
   it("rounds the margin up, never down to zero", () => {
     expect(formatDeviceOffset(3130, 0.4)).toBe("Device 3.13 s behind ±0.01 s")
     expect(formatDeviceOffset(3130, 11)).toBe("Device 3.13 s behind ±0.02 s")
+  })
+
+  it("prints a large margin no smaller than the one it judges by", () => {
+    expect(formatDeviceOffset(10_040, 10_040)).toBe("Device exact ±10.1 s")
+    expect(formatDeviceOffset(-10_200, 10_040)).toBe(
+      "Device 10.2 s ahead ±10.1 s"
+    )
+    expect(formatDeviceOffset(60_000, 59_960)).toBe("Device exact ±60 s")
+    expect(formatDeviceOffset(60_400, 60_400)).toBe("Device exact ±61 s")
+    expect(formatDeviceOffset(62_000, 60_400)).toBe("Device 62 s behind ±61 s")
   })
 
   it("drops decimals as the error grows", () => {
