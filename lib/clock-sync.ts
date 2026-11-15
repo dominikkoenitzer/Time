@@ -125,7 +125,7 @@ async function measure() {
           now?: unknown
           source?: unknown
         }
-        // A reply without a usable time fails the measurement like a lost one.
+        // A reply without a usable time counts as a lost one.
         if (typeof now !== "number" || !Number.isFinite(now)) {
           throw new Error("/api/time sent no time")
         }
