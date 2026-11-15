@@ -35,7 +35,7 @@ export function sampleOffsetMs(
  * than rtt/2, so the fastest sample is the most trustworthy one. Averaging
  * would let a single slow response drag the result.
  */
-export function pickBestSample(samples: readonly SyncSample[]): SyncSample {
+export function pickBestSample<T extends SyncSample>(samples: readonly T[]): T {
   return samples.reduce((a, b) => (b.rttMs < a.rttMs ? b : a))
 }
 
@@ -57,7 +57,8 @@ let lastSync = { ok: false, measuredAt: 0 }
 /**
  * What the last good measurement found about the device's own clock, for the
  * caption that shows it: the offset (server minus device) and the most it can
- * be wrong by, half the winning round trip. Null until one has succeeded.
+ * be wrong by, half the winning round trip. Null until one has succeeded,
+ * and null while the server answers with a clock it could not check.
  */
 export interface DeviceClock {
   offsetMs: number
@@ -102,11 +103,13 @@ async function measure() {
   measuring = true
 
   try {
-    const samples: SyncSample[] = []
+    // `checked` is false when the server had no time source to check its own clock.
+    const samples: (SyncSample & { checked: boolean })[] = []
 
     for (let i = 0; i < SAMPLES; i++) {
       const abort = new AbortController()
       const timer = setTimeout(() => abort.abort(), REQUEST_TIMEOUT_MS)
+      // A lost or bad reply costs only its own sample.
       try {
         const startWall = Date.now()
         const startMono = performance.now()
@@ -118,23 +121,36 @@ async function measure() {
         if (!response.ok) {
           throw new Error(`/api/time answered ${response.status}`)
         }
-        const { now } = (await response.json()) as { now?: unknown }
-        // A reply without a usable time fails the measurement like a lost one.
+        const { now, source } = (await response.json()) as {
+          now?: unknown
+          source?: unknown
+        }
+        // A reply without a usable time counts as a lost one.
         if (typeof now !== "number" || !Number.isFinite(now)) {
           throw new Error("/api/time sent no time")
         }
 
-        samples.push({ offsetMs: sampleOffsetMs(now, startWall, rttMs), rttMs })
+        samples.push({
+          offsetMs: sampleOffsetMs(now, startWall, rttMs),
+          rttMs,
+          checked: source !== "uncorrected",
+        })
+      } catch {
+        continue
       } finally {
         clearTimeout(timer)
       }
     }
 
+    if (samples.length === 0) throw new Error("/api/time never answered")
     const best = pickBestSample(samples)
 
     appliedOffsetMs = best.offsetMs
     lastSync = { ok: true, measuredAt: Date.now() }
-    deviceClock = { offsetMs: best.offsetMs, errorMs: best.rttMs / 2 }
+    // An unchecked server clock is no ground for calling the device exact.
+    deviceClock = best.checked
+      ? { offsetMs: best.offsetMs, errorMs: best.rttMs / 2 }
+      : null
     for (const listener of listeners) listener()
   } catch {
     lastSync = { ok: false, measuredAt: Date.now() }

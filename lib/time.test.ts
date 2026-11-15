@@ -76,6 +76,15 @@ describe("the sync against /api/time", () => {
   // The server is 5s ahead of the device.
   const ahead: Fetch = async () => Response.json({ now: Date.now() + 5000 })
 
+  // The network drops the request, as a phone link does now and then.
+  const lost: Fetch = async () => {
+    throw new TypeError("Failed to fetch")
+  }
+
+  // The server reached no time source and answers with its own clock.
+  const unchecked: Fetch = async () =>
+    Response.json({ now: Date.now() + 5000, source: "uncorrected" })
+
   // Like a real fetch, it only ever ends when its signal aborts.
   const hung: Fetch = (_url, init) =>
     new Promise((_resolve, reject) => {
@@ -143,6 +152,33 @@ describe("the sync against /api/time", () => {
     vi.setSystemTime(Date.now() + 60_000)
     await vi.advanceTimersByTimeAsync(5000)
     expect(sync.correctedNowMs()).toBe(Date.now() + 5000)
+  })
+
+  it.each([
+    ["the first", [lost, ahead]],
+    ["a middle", [ahead, ahead, lost, ahead]],
+    ["the last", [ahead, ahead, ahead, ahead, reply({}, 502)]],
+  ])(
+    "measures with the rest when %s request is lost",
+    async (_name, replies) => {
+      const sync = await startSync(...replies)
+      expect(sync.correctedNowMs()).toBe(Date.now() + 5000)
+      expect(sync.getDeviceClock()).toEqual({ offsetMs: 5000, errorMs: 0 })
+    }
+  )
+
+  it("does not call the device exact against a server that checked nothing", async () => {
+    const sync = await startSync(unchecked)
+    expect(sync.correctedNowMs()).toBe(Date.now() + 5000)
+    expect(sync.getDeviceClock()).toBeNull()
+  })
+
+  it("drops the device caption when a later server reply is unchecked", async () => {
+    const sync = await startSync(ahead, ahead, ahead, ahead, ahead, unchecked)
+    expect(sync.getDeviceClock()).not.toBeNull()
+    vi.setSystemTime(Date.now() + 60_000)
+    await vi.advanceTimersByTimeAsync(5000)
+    expect(sync.getDeviceClock()).toBeNull()
   })
 
   it.each([
@@ -457,9 +493,25 @@ describe("formatDeviceOffset: the caption under the face", () => {
     expect(formatDeviceOffset(-20, 20)).toBe("Device exact ±0.02 s")
   })
 
+  it("calls an offset inside the printed margin exact, never 0.00 s", () => {
+    expect(formatDeviceOffset(4, 1)).toBe("Device exact ±0.01 s")
+    expect(formatDeviceOffset(-6, 3)).toBe("Device exact ±0.01 s")
+    expect(formatDeviceOffset(12, 8)).toBe("Device 0.01 s behind ±0.01 s")
+  })
+
   it("rounds the margin up, never down to zero", () => {
     expect(formatDeviceOffset(3130, 0.4)).toBe("Device 3.13 s behind ±0.01 s")
     expect(formatDeviceOffset(3130, 11)).toBe("Device 3.13 s behind ±0.02 s")
+  })
+
+  it("prints a large margin no smaller than the one it judges by", () => {
+    expect(formatDeviceOffset(10_040, 10_040)).toBe("Device exact ±10.1 s")
+    expect(formatDeviceOffset(-10_200, 10_040)).toBe(
+      "Device 10.2 s ahead ±10.1 s"
+    )
+    expect(formatDeviceOffset(60_000, 59_960)).toBe("Device exact ±60 s")
+    expect(formatDeviceOffset(60_400, 60_400)).toBe("Device exact ±61 s")
+    expect(formatDeviceOffset(62_000, 60_400)).toBe("Device 62 s behind ±61 s")
   })
 
   it("drops decimals as the error grows", () => {
