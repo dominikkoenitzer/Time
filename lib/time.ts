@@ -122,7 +122,9 @@ export function getIsoWeek(wall: WallClock): number {
 export function formatDeviceOffset(offsetMs: number, errorMs: number): string {
   // Rounded up: a local round trip of a millisecond would otherwise print a
   // margin of ±0.00 s, a precision nothing here has.
-  const marginMs = Math.ceil(errorMs / 10) * 10 || 10
+  // The step matches formatSeconds, so the margin printed is the one judged by.
+  const step = errorMs < 10_000 ? 10 : errorMs < 60_000 ? 100 : 1000
+  const marginMs = Math.ceil(errorMs / step) * step || 10
   const margin = `±${formatSeconds(marginMs)}`
   // Judged against the printed margin, so no caption reads "0.00 s behind".
   if (Math.abs(offsetMs) <= marginMs) return `Device exact ${margin}`

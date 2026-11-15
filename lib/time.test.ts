@@ -250,6 +250,16 @@ describe("formatDeviceOffset: the caption under the face", () => {
     expect(formatDeviceOffset(3130, 11)).toBe("Device 3.13 s behind ±0.02 s")
   })
 
+  it("prints a large margin no smaller than the one it judges by", () => {
+    expect(formatDeviceOffset(10_040, 10_040)).toBe("Device exact ±10.1 s")
+    expect(formatDeviceOffset(-10_200, 10_040)).toBe(
+      "Device 10.2 s ahead ±10.1 s"
+    )
+    expect(formatDeviceOffset(60_000, 59_960)).toBe("Device exact ±60 s")
+    expect(formatDeviceOffset(60_400, 60_400)).toBe("Device exact ±61 s")
+    expect(formatDeviceOffset(62_000, 60_400)).toBe("Device 62 s behind ±61 s")
+  })
+
   it("drops decimals as the error grows", () => {
     expect(formatDeviceOffset(12_345, 30)).toBe("Device 12.3 s behind ±0.03 s")
     expect(formatDeviceOffset(-125_400, 30)).toBe("Device 125 s ahead ±0.03 s")
