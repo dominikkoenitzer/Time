@@ -1,5 +1,7 @@
 # Time
 
+This code is public for reference and transparency only: using, copying, changing, hosting, sharing or selling it, or building on it, needs the copyright holder's written permission first, which you can ask for by opening an issue.
+
 **The exact time, anywhere. Synchronized with the server and accurate to within hundredths of a second.**
 
 Time shows the precise, server-corrected current time, synchronized the same way NTP works, so it stays right even when the device you're viewing it on is set wrong. The whole site is one screen, greyscale and centred. Nothing to scroll, nothing to click, nothing to dismiss.
