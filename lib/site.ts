@@ -1,6 +1,6 @@
 /** Absolute origin for metadata, sitemap and robots. */
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://time.punds.ch"
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://time-izanagi.vercel.app"
 
 export const SITE_NAME = "Time"
 

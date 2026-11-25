@@ -12,7 +12,7 @@ Time shows the precise, server-corrected current time, synchronized the same way
 ![TypeScript](https://img.shields.io/badge/TypeScript-6-3178c6?logo=typescript&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss&logoColor=white)
 
-**Live:** [time.punds.ch](https://time.punds.ch)
+**Live:** [time-izanagi.vercel.app](https://time-izanagi.vercel.app)
 
 <img src="docs/screenshot.jpg" alt="Time: the synchronized clock" width="880" />
 
@@ -71,7 +71,7 @@ The site needs no environment variables to run. One optional variable is support
 
 | Variable               | Default                  | Purpose                                         |
 | ---------------------- | ------------------------ | ----------------------------------------------- |
-| `NEXT_PUBLIC_SITE_URL` | `https://time.punds.ch`  | Absolute origin for metadata, sitemap and robots |
+| `NEXT_PUBLIC_SITE_URL` | `https://time-izanagi.vercel.app`  | Absolute origin for metadata, sitemap and robots |
 
 ## Project structure
 

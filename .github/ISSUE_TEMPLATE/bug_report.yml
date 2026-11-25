@@ -33,7 +33,7 @@ body:
     attributes:
       label: Page or timezone
       description: The URL or timezone where it happens, if relevant.
-      placeholder: https://time.punds.ch/tokyo
+      placeholder: https://time-izanagi.vercel.app/tokyo
     validations:
       required: false
 
